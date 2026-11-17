@@ -1,0 +1,282 @@
+<?php
+/**
+ * Application Configuration
+ */
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    // Optimize session cookie settings
+    if (php_sapi_name() !== 'cli') {
+        session_set_cookie_params([
+            'lifetime' => 86400,
+            'path' => '/',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
+    @session_start();
+}
+
+// Output buffering with gzip for faster rendering
+if (!ob_get_level()) {
+    if (extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
+        ob_start('ob_gzhandler');
+    } else {
+        ob_start();
+    }
+}
+
+// Base URL - auto-detected or default to /Vaanakam/
+if (!defined('BASE_URL')) {
+    $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+    if (strpos($scriptDir, '/admin') !== false) {
+        $scriptDir = substr($scriptDir, 0, strpos($scriptDir, '/admin'));
+    } elseif (strpos($scriptDir, '/controllers') !== false) {
+        $scriptDir = substr($scriptDir, 0, strpos($scriptDir, '/controllers'));
+    }
+    $base = trim($scriptDir, '/.');
+    define('BASE_URL', ($base !== '' && $base !== '.') ? '/' . $base . '/' : '/Vaanakam/');
+}
+define('SITE_NAME', 'VAANAKAM');
+define('ADMIN_BRAND', 'VAANAKAM');
+define('STORE_OWNER', 'Vaanakam');
+define('STORE_BUSINESS_REG', '');
+define('STORE_DIRECTOR', 'Jekanathan Shajeevan');
+define('STORE_DIRECTOR_TITLE', 'Owner');
+define('STORE_TAGLINE', 'Good Food - Healthy Life');
+
+/**
+ * Canonical site URL for SMS, emails, and other outbound links.
+ * Uses PUBLIC_SITE_URL if set, otherwise https://STORE_DOMAIN + BASE_URL.
+ */
+function public_site_base_url(): string
+{
+    static $base = null;
+    if ($base !== null) {
+        return $base;
+    }
+
+    if (defined('PUBLIC_SITE_URL') && PUBLIC_SITE_URL !== '') {
+        $base = rtrim(PUBLIC_SITE_URL, '/');
+        return $base;
+    }
+
+    try {
+        if (!class_exists('SiteSettingsDAL', false)) {
+            require_once __DIR__ . '/../dal/SiteSettingsDAL.php';
+        }
+        $fromDb = trim((new SiteSettingsDAL())->get('public_site_url') ?? '');
+        if ($fromDb !== '') {
+            $base = rtrim($fromDb, '/');
+            return $base;
+        }
+    } catch (Throwable $e) {
+        // fall through to domain-based default
+    }
+
+    $domain = defined('STORE_DOMAIN') ? STORE_DOMAIN : 'vaanakam.lk';
+    $path = rtrim(BASE_URL, '/');
+    $base = 'https://' . $domain . $path;
+
+    return $base;
+}
+
+function public_site_url(string $path = ''): string
+{
+    $path = ltrim($path, '/');
+    $base = public_site_base_url();
+    if ($path === '') {
+        return $base . '/';
+    }
+    return $base . '/' . $path;
+}
+
+/**
+ * Build an absolute URL for Open Graph / social sharing.
+ */
+function absolute_url(string $path = ''): string
+{
+    $path = ltrim($path, '/');
+    $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    $isLocal = $host === 'localhost'
+        || $host === '127.0.0.1'
+        || str_starts_with($host, 'localhost:')
+        || str_starts_with($host, '127.0.0.1:');
+
+    // Outbound links (SMS/email) must never use localhost.
+    if ($isLocal || $host === '') {
+        return public_site_url($path);
+    }
+
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $base = rtrim(BASE_URL, '/');
+    if ($path === '') {
+        return $scheme . '://' . $host . $base . '/';
+    }
+    return $scheme . '://' . $host . $base . '/' . $path;
+}
+
+// Store contact details
+define('STORE_PHONE_1', '+94 77 030 5367');
+define('STORE_PHONE_2', '077 030 5367');
+define('STORE_EMAIL', 'info@vaanakam.lk');
+define('STORE_DOMAIN', 'vaanakam.lk');
+define('STORE_LOCATION', 'Kanukkerny West, Mulliyawalai, Mullaitivu, Sri Lanka');
+define('STORE_WHATSAPP', '94770305367');
+
+// Map — Mulliyawalai, Mullaitivu, Sri Lanka
+define('STORE_MAP_URL', 'https://www.google.com/maps/search/?api=1&query=Kanukkerny+West+Mulliyawalai+Mullaitivu+Sri+Lanka');
+define('STORE_MAP_LAT', 9.2785);
+define('STORE_MAP_LNG', 80.6015);
+define('STORE_MAP_ZOOM', 15);
+
+if (!function_exists('store_map_embed_url')) {
+    function store_map_embed_url(): string
+    {
+        if (defined('STORE_MAP_LAT') && defined('STORE_MAP_LNG') && STORE_MAP_LAT && STORE_MAP_LNG) {
+            $query = sprintf(
+                '%s,%s (%s)',
+                STORE_MAP_LAT,
+                STORE_MAP_LNG,
+                SITE_NAME . ' - ' . STORE_LOCATION
+            );
+            return 'https://maps.google.com/maps?q=' . rawurlencode($query) . '&hl=en&z=' . STORE_MAP_ZOOM . '&output=embed';
+        }
+
+        $query = sprintf(
+            '%s (%s)',
+            STORE_LOCATION,
+            SITE_NAME
+        );
+        return 'https://maps.google.com/maps?q=' . rawurlencode($query) . '&hl=en&z=' . STORE_MAP_ZOOM . '&output=embed';
+    }
+}
+
+if (!function_exists('store_map_open_url')) {
+    function store_map_open_url(): string
+    {
+        return STORE_MAP_URL;
+    }
+}
+
+if (!function_exists('store_phone_digits')) {
+    function store_phone_digits(string $phone): string
+    {
+        return preg_replace('/\D+/', '', $phone) ?? '';
+    }
+}
+
+if (!function_exists('store_phone_parts')) {
+    /** @return string[] */
+    function store_phone_parts(string $phone): array
+    {
+        $digits = store_phone_digits($phone);
+        if (preg_match('/^94(\d{2})(\d{3})(\d{4})$/', $digits, $matches)) {
+            return ['+94 ' . $matches[1], $matches[2], $matches[3]];
+        }
+        if (preg_match('/^0(\d{2})(\d{3})(\d{4})$/', $digits, $matches)) {
+            return ['0' . $matches[1], $matches[2], $matches[3]];
+        }
+
+        $parts = preg_split('/\s+/', trim($phone), -1, PREG_SPLIT_NO_EMPTY);
+
+        return $parts ?: [$phone];
+    }
+}
+
+if (!function_exists('store_phone_tel_href')) {
+    function store_phone_tel_href(string $phone): string
+    {
+        return 'tel:' . store_phone_digits($phone);
+    }
+}
+
+if (!function_exists('render_store_phone_link')) {
+    function render_store_phone_link(string $phone, array $options = []): string
+    {
+        $class = trim('store-phone-link ' . ($options['class'] ?? ''));
+        $partClass = $options['part_class'] ?? 'store-phone-part';
+        $extraAttrs = $options['attrs'] ?? [];
+
+        $attrHtml = ' href="' . htmlspecialchars(store_phone_tel_href($phone), ENT_QUOTES, 'UTF-8') . '"'
+            . ' aria-label="Call ' . htmlspecialchars($phone, ENT_QUOTES, 'UTF-8') . '"';
+        foreach ($extraAttrs as $name => $value) {
+            $attrHtml .= ' ' . htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8')
+                . '="' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '"';
+        }
+
+        $partsHtml = '';
+        foreach (store_phone_parts($phone) as $part) {
+            $partsHtml .= '<span class="' . htmlspecialchars($partClass, ENT_QUOTES, 'UTF-8') . '">'
+                . htmlspecialchars($part, ENT_QUOTES, 'UTF-8') . '</span>';
+        }
+
+        return '<a class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '"' . $attrHtml . '>'
+            . $partsHtml
+            . '</a>';
+    }
+}
+
+if (!function_exists('render_store_phone_numbers')) {
+    /** @param string[] $phones */
+    function render_store_phone_numbers(array $phones, array $options = []): string
+    {
+        $tableClass = trim('store-phone-table ' . ($options['table_class'] ?? ''));
+        $extraAttrs = $options['attrs'] ?? [];
+
+        $attrHtml = '';
+        foreach ($extraAttrs as $name => $value) {
+            $attrHtml .= ' ' . htmlspecialchars((string) $name, ENT_QUOTES, 'UTF-8')
+                . '="' . htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8') . '"';
+        }
+
+        $html = '<table class="' . htmlspecialchars($tableClass, ENT_QUOTES, 'UTF-8') . '" role="presentation"><tbody>';
+
+        foreach ($phones as $phone) {
+            $phone = (string) $phone;
+            $href = htmlspecialchars(store_phone_tel_href($phone), ENT_QUOTES, 'UTF-8');
+            $label = htmlspecialchars($phone, ENT_QUOTES, 'UTF-8');
+            $parts = store_phone_parts($phone);
+
+            $html .= '<tr class="store-phone-row">';
+            foreach ($parts as $part) {
+                $html .= '<td class="store-phone-cell">';
+                $html .= '<a class="store-phone-link" href="' . $href . '" aria-label="Call ' . $label . '"' . $attrHtml . '>';
+                $html .= htmlspecialchars($part, ENT_QUOTES, 'UTF-8');
+                $html .= '</a></td>';
+            }
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody></table>';
+
+        return $html;
+    }
+}
+
+// Social media profiles
+define('STORE_FACEBOOK_URL', 'https://www.facebook.com/vaanakam');
+define('STORE_INSTAGRAM_URL', 'https://www.instagram.com/vaanakam');
+define('STORE_TIKTOK_URL', 'https://www.tiktok.com/@vaanakam');
+define('STORE_WHATSAPP_URL', 'https://wa.me/94770305367');
+
+// Language
+require_once __DIR__ . '/language.php';
+require_once __DIR__ . '/../helpers/language.php';
+
+// Currency (base prices in DB are LKR)
+require_once __DIR__ . '/currency.php';
+require_once __DIR__ . '/../helpers/currency.php';
+require_once __DIR__ . '/../helpers/images.php';
+require_once __DIR__ . '/../helpers/email.php';
+require_once __DIR__ . '/../helpers/invoice.php';
+require_once __DIR__ . '/../helpers/sms.php';
+$__warrantyHelper = __DIR__ . '/../helpers/warranty.php';
+if (is_file($__warrantyHelper)) {
+    require_once $__warrantyHelper;
+}
+require_once __DIR__ . '/../helpers/analytics.php';
+
+// Error reporting (set to 0 in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
