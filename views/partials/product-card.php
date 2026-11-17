@@ -21,8 +21,8 @@ $m = ezymart_product_card_metrics($prod, $cardContext);
 $productUrl = BASE_URL . 'product.php?slug=' . rawurlencode($prod['slug'] ?? '');
 $imageUrl = !empty($prod['image']) ? media_image_url($prod['image']) : '';
 
-$translatedName = translate_product_name($prod['name'] ?? '');
-$translatedCategory = translate_text($prod['category_name'] ?? '');
+$translatedName = translate_product_name($prod['name'] ?? '', $prod['name_ta'] ?? null);
+$translatedCategory = translate_text($prod['category_name'] ?? '', $prod['category_name_ta'] ?? null);
 ?>
 <article class="ez-product-card"
     data-product-id="<?php echo $m['productId']; ?>"

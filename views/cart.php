@@ -344,7 +344,7 @@ try {
                                         <div class="cart-product-img" style="display:flex; align-items:center; justify-content:center; color:#ccc; font-size:1.5rem;"><i class="fas fa-tshirt"></i></div>
                                         <?php endif; ?>
                                         <div class="cart-product-info">
-                                            <h4><a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($item['slug']); ?>"><?php echo htmlspecialchars(translate_product_name($item['name'])); ?></a></h4>
+                                            <h4><a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($item['slug']); ?>"><?php echo htmlspecialchars(translate_product_name($item['name'], $item['name_ta'] ?? null)); ?></a></h4>
                                             <?php if (!empty($item['variation_label'])): ?>
                                             <span class="cart-author" style="color:#22C55E; font-weight:600;"><?php echo htmlspecialchars($item['variation_label']); ?></span>
                                             <?php endif; ?>

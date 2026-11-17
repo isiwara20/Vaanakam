@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../dal/ProductVariationDAL.php';
 require_once __DIR__ . '/../dal/SubcategoryDAL.php';
 require_once __DIR__ . '/../helpers/restock.php';
+require_once __DIR__ . '/../helpers/language.php';
 
 $warrantyHelper = __DIR__ . '/../helpers/warranty.php';
 if (is_file($warrantyHelper)) {
@@ -43,6 +44,9 @@ try {
     $conn->exec("ALTER TABLE products ADD COLUMN cost_price DECIMAL(10,2) NULL AFTER original_price");
 } catch (Exception $e) {}
 try {
+    $conn->exec("ALTER TABLE products ADD COLUMN name_ta VARCHAR(255) NULL AFTER name");
+} catch (Exception $e) {}
+try {
     $conn->exec("ALTER TABLE products ADD COLUMN warranty_period VARCHAR(20) NULL DEFAULT NULL AFTER stock");
 } catch (Exception $e) {}
 
@@ -75,6 +79,10 @@ if (isset($_GET['id'])) {
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
+    $nameTa = trim($_POST['name_ta'] ?? '');
+    if ($name !== '' && $nameTa === '') {
+        $nameTa = auto_translate_to_tamil($name);
+    }
     $categoryId = (int)($_POST['category_id'] ?? 0);
     $subcategoryId = !empty($_POST['subcategory_id']) ? (int)$_POST['subcategory_id'] : null;
     $description = trim($_POST['description'] ?? '');
@@ -185,15 +193,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($isEdit) {
             $stmt = $conn->prepare("UPDATE products SET 
-                category_id = :category_id, subcategory_id = :subcategory_id, name = :name, slug = :slug, description = :description, 
+                category_id = :category_id, subcategory_id = :subcategory_id, name = :name, name_ta = :name_ta, slug = :slug, description = :description, 
                 details = :details, price = :price, original_price = :original_price, cost_price = :cost_price, stock = :stock, warranty_period = :warranty_period,
                 image = :image, images = :images, author = :author, status = :status, featured = :featured, has_variations = :has_variations
                 WHERE id = :id");
             $stmt->bindParam(':id', $editProduct['id'], PDO::PARAM_INT);
         } else {
             $stmt = $conn->prepare("INSERT INTO products 
-                (category_id, subcategory_id, name, slug, description, details, price, original_price, cost_price, stock, warranty_period, image, images, author, status, featured, has_variations) 
-                VALUES (:category_id, :subcategory_id, :name, :slug, :description, :details, :price, :original_price, :cost_price, :stock, :warranty_period, :image, :images, :author, :status, :featured, :has_variations)");
+                (category_id, subcategory_id, name, name_ta, slug, description, details, price, original_price, cost_price, stock, warranty_period, image, images, author, status, featured, has_variations) 
+                VALUES (:category_id, :subcategory_id, :name, :name_ta, :slug, :description, :details, :price, :original_price, :cost_price, :stock, :warranty_period, :image, :images, :author, :status, :featured, :has_variations)");
         }
         
         $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
@@ -203,6 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bindParam(':subcategory_id', $subcategoryId, PDO::PARAM_INT);
         }
         $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':name_ta', $nameTa);
         $stmt->bindParam(':slug', $slug);
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':details', $details);
@@ -659,10 +668,21 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                 <h3 class="form-card-title">Basic Information</h3>
                                 
                                 <div class="form-group">
-                                    <label for="name">Product Name <span class="required">*</span></label>
+                                    <label for="name">Product Name (English) <span class="required">*</span></label>
                                     <input type="text" id="name" name="name" class="form-control" 
                                            value="<?php echo htmlspecialchars($editProduct['name'] ?? ''); ?>" 
-                                           required oninput="generateSlug(this.value)">
+                                           required oninput="generateSlug(this.value); autoTranslateTamil(this.value, 'name_ta');">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="name_ta">Product Name in Tamil <span style="font-weight:600;color:#16a34a;font-size:12px;">(தானியங்கி / Auto-Generated தமிழ்)</span></label>
+                                    <input type="text" id="name_ta" name="name_ta" class="form-control" 
+                                           value="<?php echo htmlspecialchars($editProduct['name_ta'] ?? ''); ?>" 
+                                           placeholder="தானாக மொழிபெயர்க்கப்படும் / Auto-translated in Tamil..."
+                                           oninput="this.dataset.userEdited = 'true';">
+                                    <small style="color:#64748b;font-size:11px;display:block;margin-top:4px;">
+                                        <i class="fas fa-language" style="color:#16a34a;"></i> Auto-translates as you type in English above. You can also customize or type in Tamil directly.
+                                    </small>
                                 </div>
 
                                 <div class="form-group">
@@ -1436,6 +1456,27 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     renderVariationOptions();
     renderVariationRows();
     toggleVariationsSection();
+
+    var _translateTimer = null;
+    function autoTranslateTamil(val, targetId) {
+        clearTimeout(_translateTimer);
+        var el = document.getElementById(targetId);
+        if (!val || !val.trim()) {
+            if (el && (!el.dataset.userEdited || el.dataset.userEdited !== 'true')) el.value = '';
+            return;
+        }
+        if (el && el.dataset.userEdited === 'true' && el.value.trim() !== '') return;
+        _translateTimer = setTimeout(function() {
+            fetch('<?php echo BASE_URL; ?>translate-api.php?text=' + encodeURIComponent(val))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.success && el && (!el.dataset.userEdited || el.dataset.userEdited !== 'true')) {
+                        el.value = data.tamil;
+                    }
+                })
+                .catch(function(e) {});
+        }, 220);
+    }
     </script>
 </body>
 </html>

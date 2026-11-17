@@ -59,7 +59,7 @@ $navIsShop = ($navScript === 'shop.php');
                         ?>
                         <li data-cat-id="<?php echo $navCat['id']; ?>" class="<?php echo ($dropdownActive || (!$navCategorySlug && $index === 0)) ? 'active' : ''; ?>">
                             <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($navCat['slug']); ?>">
-                                <span><?php echo htmlspecialchars(translate_text($navCat['name'])); ?></span>
+                                <span><?php echo htmlspecialchars(translate_text($navCat['name'], $navCat['name_ta'] ?? null)); ?></span>
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>
@@ -78,7 +78,7 @@ $navIsShop = ($navScript === 'shop.php');
                                     <?php foreach ($data['items'] as $sub): ?>
                                     <li>
                                         <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($navCat['slug']); ?>&subcategory=<?php echo htmlspecialchars($sub['slug']); ?>">
-                                            <span><?php echo htmlspecialchars(translate_text($sub['name'])); ?></span>
+                                            <span><?php echo htmlspecialchars(translate_text($sub['name'], $sub['name_ta'] ?? null)); ?></span>
                                         </a>
                                     </li>
                                     <?php endforeach; ?>
@@ -86,7 +86,7 @@ $navIsShop = ($navScript === 'shop.php');
                                     <?php foreach ($data['items'] as $navProd): ?>
                                     <li>
                                         <a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($navProd['slug']); ?>">
-                                            <span><?php echo htmlspecialchars(translate_product_name($navProd['name'])); ?></span>
+                                            <span><?php echo htmlspecialchars(translate_product_name($navProd['name'], $navProd['name_ta'] ?? null)); ?></span>
                                         </a>
                                     </li>
                                     <?php endforeach; ?>
@@ -106,7 +106,7 @@ $navIsShop = ($navScript === 'shop.php');
                 $catActive = $navIsShop && $navCategorySlug !== '' && strtolower((string)$navCat['slug']) === $navCategorySlug;
             ?>
             <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($navCat['slug']); ?>" class="cat-link<?php echo $catActive ? ' active' : ''; ?>">
-                <?php echo htmlspecialchars(translate_text($navCat['name'])); ?>
+                <?php echo htmlspecialchars(translate_text($navCat['name'], $navCat['name_ta'] ?? null)); ?>
             </a>
             <?php endforeach; ?>
             <a href="<?php echo BASE_URL; ?>about.php" class="cat-link<?php echo $navIsAbout ? ' active' : ''; ?>"><?php echo __t('about_us'); ?></a>

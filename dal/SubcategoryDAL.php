@@ -36,6 +36,10 @@ class SubcategoryDAL {
             $this->conn->exec("ALTER TABLE subcategories ADD COLUMN sort_order INT DEFAULT 0 AFTER image");
         } catch (\Exception $e) {}
 
+        try {
+            $this->conn->exec("ALTER TABLE subcategories ADD COLUMN name_ta VARCHAR(150) NULL AFTER name");
+        } catch (\Exception $e) {}
+
 
         // Add subcategory_id to products table if not exists
         try {
@@ -50,13 +54,13 @@ class SubcategoryDAL {
     }
 
     public function getAll() {
-        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id ORDER BY c.sort_order ASC, c.name ASC, s.sort_order ASC, s.name ASC");
+        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id ORDER BY c.sort_order ASC, c.name ASC, s.sort_order ASC, s.name ASC");
         $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function getActive() {
-        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.status = 'active' ORDER BY c.sort_order ASC, c.name ASC, s.sort_order ASC, s.name ASC");
+        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.status = 'active' ORDER BY c.sort_order ASC, c.name ASC, s.sort_order ASC, s.name ASC");
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -74,22 +78,23 @@ class SubcategoryDAL {
     }
 
     public function getById($id) {
-        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.id = :id");
+        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.id = :id");
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();
     }
 
     public function getBySlug($slug) {
-        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.slug = :slug");
+        $stmt = $this->conn->prepare("SELECT s.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " s LEFT JOIN categories c ON s.category_id = c.id WHERE s.slug = :slug");
         $stmt->execute([':slug' => $slug]);
         return $stmt->fetch();
     }
 
-    public function create($categoryId, $name, $slug, $description, $image, $status) {
-        $stmt = $this->conn->prepare("INSERT INTO " . $this->table . " (category_id, name, slug, description, image, status) VALUES (:category_id, :name, :slug, :description, :image, :status)");
+    public function create($categoryId, $name, $slug, $description, $image, $status, $nameTa = null) {
+        $stmt = $this->conn->prepare("INSERT INTO " . $this->table . " (category_id, name, name_ta, slug, description, image, status) VALUES (:category_id, :name, :name_ta, :slug, :description, :image, :status)");
         return $stmt->execute([
             ':category_id' => $categoryId,
             ':name' => $name,
+            ':name_ta' => !empty($nameTa) ? $nameTa : null,
             ':slug' => $slug,
             ':description' => $description,
             ':image' => $image,
@@ -97,12 +102,13 @@ class SubcategoryDAL {
         ]);
     }
 
-    public function update($id, $categoryId, $name, $slug, $description, $image, $status) {
+    public function update($id, $categoryId, $name, $slug, $description, $image, $status, $nameTa = null) {
         if ($image) {
-            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET category_id=:category_id, name=:name, slug=:slug, description=:description, image=:image, status=:status WHERE id=:id");
+            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET category_id=:category_id, name=:name, name_ta=:name_ta, slug=:slug, description=:description, image=:image, status=:status WHERE id=:id");
             return $stmt->execute([
                 ':category_id' => $categoryId,
                 ':name' => $name,
+                ':name_ta' => !empty($nameTa) ? $nameTa : null,
                 ':slug' => $slug,
                 ':description' => $description,
                 ':image' => $image,
@@ -110,10 +116,11 @@ class SubcategoryDAL {
                 ':id' => $id
             ]);
         } else {
-            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET category_id=:category_id, name=:name, slug=:slug, description=:description, status=:status WHERE id=:id");
+            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET category_id=:category_id, name=:name, name_ta=:name_ta, slug=:slug, description=:description, status=:status WHERE id=:id");
             return $stmt->execute([
                 ':category_id' => $categoryId,
                 ':name' => $name,
+                ':name_ta' => !empty($nameTa) ? $nameTa : null,
                 ':slug' => $slug,
                 ':description' => $description,
                 ':status' => $status,

@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
-$pageTitle = "Forgot Password - " . SITE_NAME;
+$pageTitle = __t('forgot_password') . " - " . SITE_NAME;
 $pagePreloadImages = [asset_image_url('assets/images/login-couple3.png')];
 require_once __DIR__ . '/partials/header.php';
 
@@ -22,8 +22,8 @@ unset($_SESSION['fp_error'], $_SESSION['fp_success'], $_SESSION['fp_email']);
                         <i class="fas fa-lock"></i>
                     </span>
                 </div>
-                <h1>Forgot Password?</h1>
-                <p class="login-subtitle">No worries! Enter your email address and we'll send you a link to reset your password.</p>
+                <h1><?php echo __t('forgot_password_q'); ?></h1>
+                <p class="login-subtitle"><?php echo __t('forgot_password_desc'); ?></p>
 
                 <?php if ($fpError): ?>
                     <div class="alert alert-error">
@@ -43,24 +43,24 @@ unset($_SESSION['fp_error'], $_SESSION['fp_success'], $_SESSION['fp_email']);
                     <input type="hidden" name="action" value="forgot_password">
 
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email"><?php echo __t('email_address'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-icon"></i>
                             <input type="email" id="email" name="email" 
-                                   placeholder="Enter your registered email" 
+                                   placeholder="<?php echo htmlspecialchars(__t('enter_email_placeholder')); ?>" 
                                    value="<?php echo htmlspecialchars($fpEmail); ?>" required>
                         </div>
                     </div>
 
                     <button type="submit" class="btn-login">
-                        <span>Send Reset Link</span>
+                        <span><?php echo __t('send_reset_link'); ?></span>
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </form>
 
                 <div class="back-to-login">
                     <a href="<?php echo BASE_URL; ?>login.php">
-                        <i class="fas fa-arrow-left"></i> Back to Login
+                        <i class="fas fa-arrow-left"></i> <?php echo __t('back_to_login'); ?>
                     </a>
                 </div>
             </div>
@@ -68,7 +68,7 @@ unset($_SESSION['fp_error'], $_SESSION['fp_success'], $_SESSION['fp_email']);
             <!-- Right: Branding Panel -->
             <div class="login-brand-panel">
                 <?php echo render_asset_image('assets/images/login-couple3.png', [
-                    'alt' => 'Style That Defines You',
+                    'alt' => SITE_NAME,
                     'class' => 'brand-panel-img',
                     'fetchpriority' => 'high',
                     'loading' => 'eager',

@@ -39,10 +39,11 @@ class CategoryDAL {
         return $stmt->fetch();
     }
 
-    public function create($name, $slug, $description, $image, $status) {
-        $stmt = $this->conn->prepare("INSERT INTO " . $this->table . " (name, slug, description, image, status) VALUES (:name, :slug, :description, :image, :status)");
+    public function create($name, $slug, $description, $image, $status, $nameTa = null) {
+        $stmt = $this->conn->prepare("INSERT INTO " . $this->table . " (name, name_ta, slug, description, image, status) VALUES (:name, :name_ta, :slug, :description, :image, :status)");
         return $stmt->execute([
             ':name' => $name,
+            ':name_ta' => !empty($nameTa) ? $nameTa : null,
             ':slug' => $slug,
             ':description' => $description,
             ':image' => $image,
@@ -50,13 +51,13 @@ class CategoryDAL {
         ]);
     }
 
-    public function update($id, $name, $slug, $description, $image, $status) {
+    public function update($id, $name, $slug, $description, $image, $status, $nameTa = null) {
         if ($image) {
-            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET name=:name, slug=:slug, description=:description, image=:image, status=:status WHERE id=:id");
-            return $stmt->execute([':name'=>$name, ':slug'=>$slug, ':description'=>$description, ':image'=>$image, ':status'=>$status, ':id'=>$id]);
+            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET name=:name, name_ta=:name_ta, slug=:slug, description=:description, image=:image, status=:status WHERE id=:id");
+            return $stmt->execute([':name'=>$name, ':name_ta'=>!empty($nameTa) ? $nameTa : null, ':slug'=>$slug, ':description'=>$description, ':image'=>$image, ':status'=>$status, ':id'=>$id]);
         } else {
-            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET name=:name, slug=:slug, description=:description, status=:status WHERE id=:id");
-            return $stmt->execute([':name'=>$name, ':slug'=>$slug, ':description'=>$description, ':status'=>$status, ':id'=>$id]);
+            $stmt = $this->conn->prepare("UPDATE " . $this->table . " SET name=:name, name_ta=:name_ta, slug=:slug, description=:description, status=:status WHERE id=:id");
+            return $stmt->execute([':name'=>$name, ':name_ta'=>!empty($nameTa) ? $nameTa : null, ':slug'=>$slug, ':description'=>$description, ':status'=>$status, ':id'=>$id]);
         }
     }
 

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config/app.php';
 $pageTitle = __t('about_us') . " - " . SITE_NAME;
 require_once __DIR__ . '/partials/header.php';
+$isTamil = (get_current_language() === 'ta');
 
 $aboutBannerUrl = null;
 $aboutBannerRoot = dirname(__DIR__);
@@ -754,9 +755,9 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
     </div>
     <div class="container">
         <div class="lumak-about-hero-inner">
-            <span class="lumak-about-hero-badge"><i class="fas fa-leaf"></i> 100% Pure &amp; Natural Groceries</span>
-            <h1>About <span><?php echo SITE_NAME; ?></span></h1>
-            <p class="lumak-about-hero-lead">Sri Lanka's trusted destination for authentic cold-pressed oils, premium cashews, traditional grains, and natural grocery essentials by <?php echo STORE_OWNER; ?>. Pure food, island wide delivery, and healthy living from Mullaitivu.</p>
+            <span class="lumak-about-hero-badge"><i class="fas fa-leaf"></i> <?php echo $isTamil ? '100% தூய இயற்கை உணவுகள்' : '100% Pure &amp; Natural Groceries'; ?></span>
+            <h1><?php echo $isTamil ? 'வானகம் <span>பற்றி</span>' : 'About <span>' . SITE_NAME . '</span>'; ?></h1>
+            <p class="lumak-about-hero-lead"><?php echo $isTamil ? 'முல்லைத்தீவின் இயற்கை மணம் கமழும் தூய மரச்செக்கு எண்ணெய்கள், உயர்தர முந்திரி, பாரம்பரிய அரிசி மற்றும் இயற்கை மளிகைப் பொருட்களுக்கான நம்பகமான அங்காடி. தூய உணவு, இலங்கை தழுவிய விநியோகம், ஆரோக்கியமான வாழ்வு.' : 'Sri Lanka\'s trusted destination for authentic cold-pressed oils, premium cashews, traditional grains, and natural grocery essentials by ' . STORE_OWNER . '. Pure food, island wide delivery, and healthy living from Mullaitivu.'; ?></p>
         </div>
     </div>
 </header>
@@ -764,10 +765,10 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
 <!-- Stats -->
 <div class="container">
     <div class="lumak-about-stats">
-        <div class="lumak-about-stat"><strong>100%</strong><span>Pure &amp; Natural</span></div>
-        <div class="lumak-about-stat"><strong>100+</strong><span>Grocery Items</span></div>
-        <div class="lumak-about-stat"><strong>24/7</strong><span>Customer Care</span></div>
-        <div class="lumak-about-stat"><strong>SL</strong><span>Island Wide Delivery</span></div>
+        <div class="lumak-about-stat"><strong>100%</strong><span><?php echo $isTamil ? 'தூய இயற்கை' : 'Pure &amp; Natural'; ?></span></div>
+        <div class="lumak-about-stat"><strong>100+</strong><span><?php echo $isTamil ? 'மளிகைப் பொருட்கள்' : 'Grocery Items'; ?></span></div>
+        <div class="lumak-about-stat"><strong>24/7</strong><span><?php echo $isTamil ? 'வாடிக்கையாளர் ஆதரவு' : 'Customer Care'; ?></span></div>
+        <div class="lumak-about-stat"><strong>SL</strong><span><?php echo $isTamil ? 'நாடு தழுவிய விநியோகம்' : 'Island Wide Delivery'; ?></span></div>
     </div>
 </div>
 
@@ -786,14 +787,14 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
                     ]); ?>
                 </div>
                 <div class="lumak-about-story-float">
-                    <i class="fas fa-truck"></i> Island Wide Delivery
+                    <i class="fas fa-truck"></i> <?php echo $isTamil ? 'நாடு தழுவிய விநியோகம்' : 'Island Wide Delivery'; ?>
                 </div>
             </div>
             <div class="lumak-about-story-text">
-                <span class="lumak-about-eyebrow"><i class="fas fa-leaf"></i> Who We Are</span>
-                <h2>Your Trusted Natural Foods &amp; Grocery Store</h2>
-                <p><?php echo SITE_NAME; ?> is a natural foods and organic grocery store operated by <?php echo STORE_OWNER; ?>. We offer a carefully selected range of authentic cold-pressed oils, premium cashews, traditional rice and grains, organic spices, and natural health products at fair prices.</p>
-                <p>Based at <?php echo STORE_LOCATION; ?>, we serve families and health-conscious customers across Sri Lanka with fresh island wide delivery and friendly customer support. Guided by our motto <em>"Good Food - Healthy Life"</em>, <?php echo SITE_NAME; ?> is dedicated to making pure, unadulterated food accessible to every home.</p>
+                <span class="lumak-about-eyebrow"><i class="fas fa-leaf"></i> <?php echo $isTamil ? 'நாங்கள் யார்' : 'Who We Are'; ?></span>
+                <h2><?php echo $isTamil ? 'உங்கள் நம்பகமான இயற்கை உணவு அங்காடி' : 'Your Trusted Natural Foods &amp; Grocery Store'; ?></h2>
+                <p><?php echo $isTamil ? 'வானகம் என்பது ' . STORE_OWNER . ' அவர்களால் நிர்வகிக்கப்படும் ஒரு இயற்கை மற்றும் பாரம்பரிய மளிகை அங்காடியாகும். முல்லைத்தீவின் தூய மரச்செக்கு தேங்காய் மற்றும் நல்லெண்ணெய், உயர்தர முந்திரி, பாரம்பரிய அரிசி வகைகள், நறுமண மசாலாப் பொருட்கள் மற்றும் இயற்கை உணவுப் பொருட்களை நியாயமான விலையில் நாங்கள் வழங்குகிறோம்.' : SITE_NAME . ' is a natural foods and organic grocery store operated by ' . STORE_OWNER . '. We offer a carefully selected range of authentic cold-pressed oils, premium cashews, traditional rice and grains, organic spices, and natural health products at fair prices.'; ?></p>
+                <p><?php echo $isTamil ? STORE_LOCATION . ' இல் அமைந்துள்ள எங்கள் நிறுவனம், இலங்கை முழுவதிலும் உள்ள குடும்பங்களுக்கு புதிய, தரமான இயற்கை உணவுகளை துரிதமாக வழங்கி வருகிறது. <em>"சிறந்த உணவு - ஆரோக்கியமான வாழ்வு"</em> என்ற எங்கள் தாரக மந்திரத்தின்படி, கலப்படமற்ற தூய உணவை ஒவ்வொரு இல்லத்திற்கும் கொண்டு சேர்ப்பதே எங்கள் குறிக்கோள்.' : 'Based at ' . STORE_LOCATION . ', we serve families and health-conscious customers across Sri Lanka with fresh island wide delivery and friendly customer support. Guided by our motto <em>"Good Food - Healthy Life"</em>, ' . SITE_NAME . ' is dedicated to making pure, unadulterated food accessible to every home.'; ?></p>
             </div>
         </div>
 
@@ -814,27 +815,27 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
                                 'class' => 'ez-director-visual-logo',
                                 'loading' => 'lazy',
                             ]); ?>
-                            <span class="ez-director-visual-badge"><i class="fas fa-user-tie"></i> Leadership</span>
+                            <span class="ez-director-visual-badge"><i class="fas fa-user-tie"></i> <?php echo $isTamil ? 'தலைமைத்துவம்' : 'Leadership'; ?></span>
                             <p class="ez-director-visual-name"><?php echo htmlspecialchars(STORE_DIRECTOR); ?></p>
-                            <span class="ez-director-visual-role"><?php echo htmlspecialchars(STORE_DIRECTOR_TITLE); ?> · <?php echo htmlspecialchars(STORE_OWNER); ?></span>
+                            <span class="ez-director-visual-role"><?php echo $isTamil ? 'உரிமையாளர் · ' . htmlspecialchars(STORE_OWNER) : htmlspecialchars(STORE_DIRECTOR_TITLE) . ' · ' . htmlspecialchars(STORE_OWNER); ?></span>
                         </div>
                     </div>
                 </div>
                 <div class="ez-director-message">
                     <div class="ez-director-head">
-                        <span class="ez-director-label">Leadership Message</span>
+                        <span class="ez-director-label"><?php echo $isTamil ? 'தலைமைச் செய்தி' : 'Leadership Message'; ?></span>
                         <h2><?php echo htmlspecialchars(STORE_DIRECTOR); ?></h2>
-                        <p class="ez-director-meta"><strong><?php echo htmlspecialchars(STORE_DIRECTOR_TITLE); ?></strong> · <?php echo htmlspecialchars(STORE_OWNER); ?></p>
+                        <p class="ez-director-meta"><strong><?php echo $isTamil ? 'உரிமையாளர்' : htmlspecialchars(STORE_DIRECTOR_TITLE); ?></strong> · <?php echo htmlspecialchars(STORE_OWNER); ?></p>
                     </div>
                     <blockquote>
-                        <p><?php echo SITE_NAME; ?> was established with a singular passion: to bring pure, chemical-free, traditional groceries and healthy natural foods to Sri Lankan families. We believe that good health begins with pure food.</p>
-                        <p>Every order is handled with genuine care — from pristine food-grade packaging to timely island wide delivery. We take pride in sourcing authentic cold-pressed oils, handpicked cashews, and traditional grains directly from trusted farmers.</p>
-                        <p>Thank you for welcoming <?php echo SITE_NAME; ?> into your kitchen. Good Food - Healthy Life!</p>
+                        <p><?php echo $isTamil ? 'இலங்கை குடும்பங்களுக்கு தூய, இரசாயனமற்ற பாரம்பரிய மளிகைப் பொருட்கள் மற்றும் ஆரோக்கியமான இயற்கை உணவுகளைக் கொண்டு சேர்க்கும் உயரிய நோக்கத்துடன் வானகம் தொடங்கப்பட்டது. நல்ல ஆரோக்கியம் தூய்மையான உணவிலிருந்து தொடங்குகிறது என்பதை நாங்கள் உறுதியாக நம்புகிறோம்.' : SITE_NAME . ' was established with a singular passion: to bring pure, chemical-free, traditional groceries and healthy natural foods to Sri Lankan families. We believe that good health begins with pure food.'; ?></p>
+                        <p><?php echo $isTamil ? 'ஒவ்வொரு ஆர்டரும் சுகாதாரமான பேக்கிங் முதல் இலங்கை தழுவிய பாதுகாப்பான விநியோகம் வரை மிகுந்த அக்கறையுடன் கையாளப்படுகிறது. நம்பிக்கையான விவசாயிகளிடமிருந்து நேரடியாகப் பெறப்பட்ட தூய மரச்செக்கு எண்ணெய்கள், தேர்ந்தெடுக்கப்பட்ட முந்திரி மற்றும் பாரம்பரிய தானியங்களை வழங்குவதில் பெருமிதம் கொள்கிறோம்.' : 'Every order is handled with genuine care — from pristine food-grade packaging to timely island wide delivery. We take pride in sourcing authentic cold-pressed oils, handpicked cashews, and traditional grains directly from trusted farmers.'; ?></p>
+                        <p><?php echo $isTamil ? 'வானகத்தை உங்கள் சமையலறையில் அன்போடு வரவேற்றமைக்கு மனமார்ந்த நன்றிகள். சிறந்த உணவு - ஆரோக்கிய வாழ்வு!' : 'Thank you for welcoming ' . SITE_NAME . ' into your kitchen. Good Food - Healthy Life!'; ?></p>
                     </blockquote>
                     <div class="ez-director-footer">
                         <div class="ez-director-footer-text">
                             <strong><?php echo htmlspecialchars(STORE_DIRECTOR); ?></strong>
-                            <?php echo htmlspecialchars(STORE_DIRECTOR_TITLE); ?>, <?php echo htmlspecialchars(STORE_OWNER); ?>
+                            <?php echo $isTamil ? 'உரிமையாளர்' : htmlspecialchars(STORE_DIRECTOR_TITLE); ?>, <?php echo htmlspecialchars(STORE_OWNER); ?>
                         </div>
                         <?php echo render_asset_image('assets/images/logobottom.png', [
                             'alt' => SITE_NAME,
@@ -850,69 +851,69 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
         <div class="lumak-about-pillars">
             <div class="lumak-about-pillar">
                 <div class="lumak-about-pillar-icon"><i class="fas fa-bullseye"></i></div>
-                <h3>Our Mission</h3>
-                <p>To deliver 100% pure, natural, and chemical-free groceries at fair prices with fresh island wide delivery and sincere customer care across Sri Lanka.</p>
+                <h3><?php echo $isTamil ? 'எங்கள் பணி' : 'Our Mission'; ?></h3>
+                <p><?php echo $isTamil ? 'இலங்கை முழுவதும் உள்ள மக்களுக்கு 100% தூய, இரசாயனமற்ற இயற்கை உணவுகளை நியாயமான விலையில், துரித விநியோகத்துடனும் வாடிக்கையாளர் நன்மதிப்புடனும் வழங்குவது.' : 'To deliver 100% pure, natural, and chemical-free groceries at fair prices with fresh island wide delivery and sincere customer care across Sri Lanka.'; ?></p>
             </div>
             <div class="lumak-about-pillar">
                 <div class="lumak-about-pillar-icon"><i class="fas fa-eye"></i></div>
-                <h3>Our Vision</h3>
-                <p>To become Sri Lanka's most trusted natural foods brand, inspiring healthy lifestyles through pure, traditional foods and sustainable agriculture.</p>
+                <h3><?php echo $isTamil ? 'எங்கள் தொலைநோக்கு' : 'Our Vision'; ?></h3>
+                <p><?php echo $isTamil ? 'பாரம்பரிய இயற்கை உணவுகள் மற்றும் நிலையான விவசாயத்தின் மூலம் ஆரோக்கியமான வாழ்வியலை ஊக்குவித்து, இலங்கையின் முன்னணி இயற்கை உணவு நிறுவனமாகத் திகழ்வது.' : 'To become Sri Lanka\'s most trusted natural foods brand, inspiring healthy lifestyles through pure, traditional foods and sustainable agriculture.'; ?></p>
             </div>
             <div class="lumak-about-pillar">
                 <div class="lumak-about-pillar-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                <h3>Our Promise</h3>
-                <p>Every grocery item is chemical-free, carefully inspected, and packed fresh for your family's health and wellbeing. Good food is our personal guarantee at <?php echo SITE_NAME; ?>.</p>
+                <h3><?php echo $isTamil ? 'எங்கள் உறுதிமொழி' : 'Our Promise'; ?></h3>
+                <p><?php echo $isTamil ? 'ஒவ்வொரு உணவுப் பொருளும் இரசாயனமற்றது, கவனமாகப் பரிசோதிக்கப்பட்டு உங்கள் குடும்பத்தின் ஆரோக்கியத்திற்காக புதியதாக பேக் செய்யப்படுகிறது. தூய உணவு எங்கள் தனிப்பட்ட உத்தரவாதம்.' : 'Every grocery item is chemical-free, carefully inspected, and packed fresh for your family\'s health and wellbeing. Good food is our personal guarantee at ' . SITE_NAME . '.'; ?></p>
             </div>
         </div>
 
         <!-- Values -->
         <div class="lumak-about-section-head">
-            <h2>What We Stand For</h2>
-            <p>The values behind every product, every package, and every customer conversation at <?php echo SITE_NAME; ?>.</p>
+            <h2><?php echo $isTamil ? 'எங்கள் அடிப்படைக் கொள்கைகள்' : 'What We Stand For'; ?></h2>
+            <p><?php echo $isTamil ? 'வானகத்தின் ஒவ்வொரு தயாரிப்பு மற்றும் வாடிக்கையாளர் சேவைக்கு பின்னாலும் உள்ள கொள்கைகள்.' : 'The values behind every product, every package, and every customer conversation at ' . SITE_NAME . '.'; ?></p>
         </div>
         <div class="lumak-about-values">
             <div class="lumak-about-value">
                 <i class="fas fa-leaf"></i>
                 <div>
-                    <h4>100% Pure &amp; Chemical Free</h4>
-                    <p>Naturally processed foods without harmful preservatives, artificial additives, or chemical adulteration.</p>
+                    <h4><?php echo $isTamil ? '100% தூய &amp; இரசாயனமற்றது' : '100% Pure &amp; Chemical Free'; ?></h4>
+                    <p><?php echo $isTamil ? 'செயற்கை நிறமூட்டிகள், பாதுகாப்புகள் அல்லது இரசாயன கலப்படங்கள் அற்ற இயற்கை உணவுகள்.' : 'Naturally processed foods without harmful preservatives, artificial additives, or chemical adulteration.'; ?></p>
                 </div>
             </div>
             <div class="lumak-about-value">
                 <i class="fas fa-seedling"></i>
                 <div>
-                    <h4>Farm Fresh &amp; Traditional</h4>
-                    <p>Authentic cold-pressed oils, hand-harvested cashews, and traditional grains that preserve natural nutrition.</p>
+                    <h4><?php echo $isTamil ? 'பாரம்பரிய மரச்செக்கு தயாரிப்புகள்' : 'Farm Fresh &amp; Traditional'; ?></h4>
+                    <p><?php echo $isTamil ? 'இயற்கை சத்துக்கள் மாறாத பாரம்பரிய மரச்செக்கு எண்ணெய்கள், கைதேர்ந்த முந்திரி மற்றும் தானியங்கள்.' : 'Authentic cold-pressed oils, hand-harvested cashews, and traditional grains that preserve natural nutrition.'; ?></p>
                 </div>
             </div>
             <div class="lumak-about-value">
                 <i class="fas fa-truck"></i>
                 <div>
-                    <h4>Island Wide Delivery</h4>
-                    <p>Secure checkout, careful packaging, and reliable shipping to your doorstep anywhere in Sri Lanka.</p>
+                    <h4><?php echo $isTamil ? 'நாடு தழுவிய விநியோகம்' : 'Island Wide Delivery'; ?></h4>
+                    <p><?php echo $isTamil ? 'பாதுகாப்பான பேக்கிங் மற்றும் உங்கள் வீட்டு வாசலுக்கே நம்பகமான விநியோகம்.' : 'Secure checkout, careful packaging, and reliable shipping to your doorstep anywhere in Sri Lanka.'; ?></p>
                 </div>
             </div>
             <div class="lumak-about-value">
                 <i class="fas fa-headset"></i>
                 <div>
-                    <h4>Customer First</h4>
-                    <p>We listen, we care, and we support you before and after every order at <?php echo SITE_NAME; ?>.</p>
+                    <h4><?php echo $isTamil ? 'வாடிக்கையாளரே முதன்மை' : 'Customer First'; ?></h4>
+                    <p><?php echo $isTamil ? 'உங்கள் ஒவ்வொரு ஆர்டருக்கும் முன்னும் பின்னும் எப்போதும் உங்களுடன் துணை நிற்கிறோம்.' : 'We listen, we care, and we support you before and after every order at ' . SITE_NAME . '.'; ?></p>
                 </div>
             </div>
         </div>
 
         <!-- Collections -->
         <div class="lumak-about-section-head">
-            <h2>Our Natural Food Categories</h2>
-            <p>Explore natural groceries and healthy living essentials at <?php echo SITE_NAME; ?>.</p>
+            <h2><?php echo $isTamil ? 'எங்கள் இயற்கை உணவுப் பிரிவுகள்' : 'Our Natural Food Categories'; ?></h2>
+            <p><?php echo $isTamil ? 'வானகத்தின் ஆரோக்கியமான இயற்கை மளிகைப் பொருட்களைப் பார்வையிடுங்கள்.' : 'Explore natural groceries and healthy living essentials at ' . SITE_NAME . '.'; ?></p>
         </div>
         <div class="lumak-about-collections">
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-bottle-droplet"></i><span>Pure Cold-Pressed Oils</span></a>
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-wheat-awn"></i><span>Rice &amp; Traditional Grains</span></a>
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-seedling"></i><span>Cashews &amp; Dry Fruits</span></a>
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-mortar-pestle"></i><span>Organic Spices &amp; Masala</span></a>
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-jar"></i><span>Natural Honey &amp; Sweets</span></a>
-            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-leaf"></i><span>Herbal &amp; Health Foods</span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-bottle-droplet"></i><span><?php echo $isTamil ? 'மரச்செக்கு எண்ணெய்கள்' : 'Pure Cold-Pressed Oils'; ?></span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-wheat-awn"></i><span><?php echo $isTamil ? 'அரிசி &amp; பாரம்பரிய தானியங்கள்' : 'Rice &amp; Traditional Grains'; ?></span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-seedling"></i><span><?php echo $isTamil ? 'முந்திரி &amp; உலர் பழங்கள்' : 'Cashews &amp; Dry Fruits'; ?></span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-mortar-pestle"></i><span><?php echo $isTamil ? 'இயற்கை மசாலா &amp; பொடிகள்' : 'Organic Spices &amp; Masala'; ?></span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-jar"></i><span><?php echo $isTamil ? 'தூய தேன் &amp; இனிப்புகள்' : 'Natural Honey &amp; Sweets'; ?></span></a>
+            <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-collection"><i class="fas fa-leaf"></i><span><?php echo $isTamil ? 'மூலிகை &amp; ஆரோக்கிய உணவுகள்' : 'Herbal &amp; Health Foods'; ?></span></a>
         </div>
 
         <!-- Contact -->
@@ -920,14 +921,14 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
             <div class="lumak-about-contact-item">
                 <i class="fas fa-map-marker-alt"></i>
                 <div>
-                    <strong>Location</strong>
+                    <strong><?php echo $isTamil ? 'முகவரி' : 'Location'; ?></strong>
                     <span><?php echo STORE_LOCATION; ?></span>
                 </div>
             </div>
             <div class="lumak-about-contact-item">
                 <i class="fas fa-phone-alt"></i>
                 <div>
-                    <strong>Call Us</strong>
+                    <strong><?php echo $isTamil ? 'அழைக்க' : 'Call Us'; ?></strong>
                     <a href="tel:<?php echo preg_replace('/\s+/', '', STORE_PHONE_1); ?>"><?php echo STORE_PHONE_1; ?></a>
                     <span> / </span>
                     <a href="tel:<?php echo preg_replace('/\s+/', '', STORE_PHONE_2); ?>"><?php echo STORE_PHONE_2; ?></a>
@@ -936,7 +937,7 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
             <div class="lumak-about-contact-item">
                 <i class="fas fa-envelope"></i>
                 <div>
-                    <strong>Email</strong>
+                    <strong><?php echo $isTamil ? 'மின்னஞ்சல்' : 'Email'; ?></strong>
                     <a href="mailto:<?php echo STORE_EMAIL; ?>"><?php echo STORE_EMAIL; ?></a>
                 </div>
             </div>
@@ -944,11 +945,11 @@ foreach (['webp', 'jpg', 'jpeg', 'png'] as $ext) {
 
         <!-- CTA -->
         <div class="lumak-about-cta">
-            <h3>Good Food - Healthy Life</h3>
-            <p>Ready to experience fresh, chemical-free groceries and authentic natural foods? Explore our pantry essentials or reach out to us anytime.</p>
+            <h3><?php echo $isTamil ? 'சிறந்த உணவு - ஆரோக்கிய வாழ்வு' : 'Good Food - Healthy Life'; ?></h3>
+            <p><?php echo $isTamil ? 'தூய, இரசாயனமற்ற இயற்கை உணவுகளையும் மளிகைப் பொருட்களையும் அனுபவிக்கத் தயாரா? எங்கள் அங்காடியைப் பார்வையிடுங்கள் அல்லது எப்போது வேண்டுமானாலும் எங்களைத் தொடர்பு கொள்ளுங்கள்.' : 'Ready to experience fresh, chemical-free groceries and authentic natural foods? Explore our pantry essentials or reach out to us anytime.'; ?></p>
             <div class="lumak-about-cta-btns">
-                <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-cta-btn primary"><i class="fas fa-shopping-bag"></i> Shop Fresh Groceries</a>
-                <a href="<?php echo BASE_URL; ?>contact.php" class="lumak-about-cta-btn secondary"><i class="fas fa-envelope"></i> Contact Us</a>
+                <a href="<?php echo BASE_URL; ?>shop.php" class="lumak-about-cta-btn primary"><i class="fas fa-shopping-bag"></i> <?php echo $isTamil ? 'இயற்கை உணவுகளை வாங்க' : 'Shop Fresh Groceries'; ?></a>
+                <a href="<?php echo BASE_URL; ?>contact.php" class="lumak-about-cta-btn secondary"><i class="fas fa-envelope"></i> <?php echo $isTamil ? 'தொடர்புகொள்ள' : 'Contact Us'; ?></a>
                 <a href="https://wa.me/<?php echo STORE_WHATSAPP; ?>" target="_blank" rel="noopener" class="lumak-about-cta-btn secondary"><i class="fab fa-whatsapp"></i> WhatsApp</a>
             </div>
         </div>

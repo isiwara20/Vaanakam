@@ -6,6 +6,7 @@ require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../dal/SubcategoryDAL.php';
 require_once __DIR__ . '/../dal/CategoryDAL.php';
 require_once __DIR__ . '/../helpers/db_schema.php';
+require_once __DIR__ . '/../helpers/language.php';
 
 // Check if user is admin
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -33,12 +34,17 @@ $categories = array_values(array_filter(
     static fn(array $cat): bool => (int) ($cat['id'] ?? 0) > 0
 ));
 
-// Ensure sort_order column exists
+// Ensure sort_order and name_ta columns exist
 try {
     require_once __DIR__ . '/../config/database.php';
     $database = new Database();
     $conn = $database->getConnection();
     $conn->exec("ALTER TABLE subcategories ADD COLUMN sort_order INT DEFAULT 0 AFTER image");
+} catch (Exception $e) {}
+try {
+    if (isset($conn) && $conn) {
+        $conn->exec("ALTER TABLE subcategories ADD COLUMN name_ta VARCHAR(150) NULL AFTER name");
+    }
 } catch (Exception $e) {}
 
 // Handle sort order update via AJAX
@@ -79,6 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($action === 'create' || $action === 'update') {
         $name = trim($_POST['name'] ?? '');
+        $nameTa = trim($_POST['name_ta'] ?? '');
+        if ($name !== '' && $nameTa === '') {
+            $nameTa = auto_translate_to_tamil($name);
+        }
         $categoryId = (int)($_POST['category_id'] ?? 0);
         $description = trim($_POST['description'] ?? '');
         $status = $_POST['status'] ?? 'active';
@@ -152,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($message)) {
             if ($action === 'create') {
                 try {
-                    if ($subcategoryDAL->create($categoryId, $name, $slug, $description, $imagePath, $status)) {
+                    if ($subcategoryDAL->create($categoryId, $name, $slug, $description, $imagePath, $status, $nameTa)) {
                         $_SESSION['subcat_message'] = 'Subcategory created successfully!';
                         $_SESSION['subcat_message_type'] = 'success';
                     } else {
@@ -180,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $old = $subcategoryDAL->getById($id);
                     try {
-                        if ($subcategoryDAL->update($id, $categoryId, $name, $slug, $description, $imagePath, $status)) {
+                        if ($subcategoryDAL->update($id, $categoryId, $name, $slug, $description, $imagePath, $status, $nameTa)) {
                             if (!empty($imagePath) && $old && !empty($old['image']) && $old['image'] !== $imagePath) {
                                 $oldFile = __DIR__ . '/../' . $old['image'];
                                 if (file_exists($oldFile)) {
@@ -327,12 +337,23 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="name">Subcategory Name <span class="required">*</span></label>
+                                <label for="name">Subcategory Name (English) <span class="required">*</span></label>
                                 <input type="text" id="name" name="name" class="form-control" 
                                        value="<?php echo htmlspecialchars($editSubcategory['name'] ?? ''); ?>" 
-                                       placeholder="e.g. Laptops, Keyboards, Routers"
-                                       required oninput="generateSlug(this.value)">
+                                       placeholder="e.g. Traditional Rice, Cold-Pressed Oils, Spices"
+                                       required oninput="generateSlug(this.value); autoTranslateTamil(this.value, 'subcat_name_ta');">
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subcat_name_ta">
+                                Subcategory Name in Tamil (தானியங்கி / Auto-Generated தமிழ்)
+                                <small style="color:#16A34A; font-weight:normal;">— automatically translated from English, or edit manually</small>
+                            </label>
+                            <input type="text" id="subcat_name_ta" name="name_ta" class="form-control" 
+                                   value="<?php echo htmlspecialchars($editSubcategory['name_ta'] ?? ''); ?>" 
+                                   placeholder="எ.கா. பாரம்பரிய அரிசி, மரச்செக்கு எண்ணெய்"
+                                   oninput="this.dataset.userEdited = 'true';">
                         </div>
 
                         <div class="form-group">
@@ -415,7 +436,12 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                     <div class="table-img-placeholder"><i class="fas fa-sitemap"></i></div>
                                     <?php endif; ?>
                                 </td>
-                                <td><strong><?php echo htmlspecialchars($sub['name']); ?></strong></td>
+                                <td>
+                                    <strong><?php echo htmlspecialchars($sub['name']); ?></strong>
+                                    <?php if (!empty($sub['name_ta'])): ?>
+                                        <div style="font-size:12px; color:#16A34A; margin-top:2px; font-weight:600;"><?php echo htmlspecialchars($sub['name_ta']); ?></div>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <span class="badge-count" style="background:#f0f9f4; color:#1a3c2a;"><?php echo htmlspecialchars($sub['category_name']); ?></span>
                                 </td>
@@ -474,6 +500,30 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         document.getElementById('slug_preview').value = slug;
     }
 
+    var _subcatTransTimer = null;
+    function autoTranslateTamil(text, targetId) {
+        var target = document.getElementById(targetId);
+        if (!target) return;
+        if (target.dataset.userEdited === 'true') return;
+        if (!text || text.trim() === '') {
+            target.value = '';
+            return;
+        }
+        clearTimeout(_subcatTransTimer);
+        _subcatTransTimer = setTimeout(function() {
+            fetch('<?php echo BASE_URL; ?>translate-api.php?text=' + encodeURIComponent(text))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data && data.success && data.tamil && target.dataset.userEdited !== 'true') {
+                        target.value = data.tamil;
+                    }
+                })
+                .catch(function(err) {
+                    console.warn('Tamil translation error:', err);
+                });
+        }, 300);
+    }
+
     // Reset form to "Add New" mode
     function resetSubcategoryForm() {
         if (window.location.search.indexOf('edit=') !== -1) {
@@ -486,6 +536,8 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         var idField = form.querySelector('input[name="id"]');
         if (idField) idField.remove();
         document.getElementById('name').value = '';
+        var nameTaField = document.getElementById('subcat_name_ta');
+        if (nameTaField) { nameTaField.value = ''; delete nameTaField.dataset.userEdited; }
         document.getElementById('slug_preview').value = '';
         document.getElementById('description').value = '';
         document.getElementById('status').value = 'active';

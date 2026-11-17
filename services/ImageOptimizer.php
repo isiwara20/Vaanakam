@@ -139,19 +139,25 @@ class ImageOptimizer {
     /**
      * Optimize a banner image for high visual fidelity.
      * - Always outputs WebP when supported.
-     * - Preserves original dimensions (no downscaling).
-     * - Uses near-lossless quality to avoid visible degradation.
+     * - Protects against memory exhaustion on shared cPanel hosting by capping maximum resolution.
+     * - Uses high quality (90) to maintain crisp visuals while preventing server timeouts.
      */
-    public static function optimizeBanner($filePath, $quality = 96) {
+    public static function optimizeBanner($filePath, $quality = 90) {
         if (!file_exists($filePath)) return false;
+        @ini_set('memory_limit', '256M');
+        @set_time_limit(120);
+
         $imageInfo = @getimagesize($filePath);
         if (!$imageInfo) return false;
 
         $origWidth = (int)$imageInfo[0];
         $origHeight = (int)$imageInfo[1];
 
-        // Keep full source dimensions so banner quality is not reduced.
-        return self::optimize($filePath, $origWidth, $origHeight, $quality, true);
+        // Cap maximum dimensions to 2560x1440 to avoid memory crashes on cPanel shared hosting
+        $maxWidth = min($origWidth, 2560);
+        $maxHeight = min($origHeight, 1440);
+
+        return self::optimize($filePath, $maxWidth, $maxHeight, $quality, true);
     }
 
     /**

@@ -11,30 +11,61 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 $bannerDAL = new BannerDAL();
 $adminName = $_SESSION['user_name'] ?? 'Admin';
 $message = '';
+$messageType = 'success';
 
 // Handle upload
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST) && empty($_FILES) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+    $message = 'The uploaded file exceeds the post_max_size (' . ini_get('post_max_size') . ') in server PHP settings.';
+    $messageType = 'error';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload') {
     if (isset($_FILES['banner_image']) && $_FILES['banner_image']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['banner_image'];
         $allowed = ['image/jpeg', 'image/png', 'image/webp'];
-        if (in_array($file['type'], $allowed) && $file['size'] < 5 * 1024 * 1024) {
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+        if (in_array($file['type'], $allowed) && $file['size'] < 15 * 1024 * 1024) {
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             $filename = 'banner_' . time() . '_' . uniqid() . '.' . $ext;
-            $dest = __DIR__ . '/../assets/uploads/banners/' . $filename;
+            $uploadDir = __DIR__ . '/../assets/uploads/banners/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0755, true);
+            }
+            $dest = $uploadDir . $filename;
             if (move_uploaded_file($file['tmp_name'], $dest)) {
-                // Convert to high-quality WebP while preserving source dimensions.
+                // Convert to high-quality WebP while keeping memory safe on shared hosting
                 require_once __DIR__ . '/../services/ImageOptimizer.php';
-                $optimizedPath = ImageOptimizer::optimizeBanner($dest, 96);
-                $optimizedFilename = basename($optimizedPath);
+                $optimizedPath = ImageOptimizer::optimizeBanner($dest, 90);
+                $optimizedFilename = basename($optimizedPath ?: $dest);
                 
                 $title = trim($_POST['title'] ?? '');
                 $link = trim($_POST['link'] ?? '');
                 $sortOrder = (int)($_POST['sort_order'] ?? 0);
                 $bannerDAL->create($title, 'assets/uploads/banners/' . $optimizedFilename, $link, $sortOrder);
                 $message = 'Banner uploaded successfully!';
+                $messageType = 'success';
+            } else {
+                $message = 'Failed to move uploaded file. Check folder write permissions on assets/uploads/banners.';
+                $messageType = 'error';
             }
         } else {
-            $message = 'Invalid file. Use JPG/PNG/WEBP under 5MB.';
+            $message = 'Invalid file. Please use a JPG, PNG, or WebP image under 15MB.';
+            $messageType = 'error';
+        }
+    } else {
+        $errCode = $_FILES['banner_image']['error'] ?? UPLOAD_ERR_NO_FILE;
+        $messageType = 'error';
+        switch ($errCode) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $message = 'The file is too large for the server. Server upload_max_filesize limit is currently ' . ini_get('upload_max_filesize') . '. Increase it in cPanel > MultiPHP INI Editor.';
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $message = 'File upload was interrupted. Please try again.';
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $message = 'No file was chosen. Please select an image.';
+                break;
+            default:
+                $message = 'Upload failed with error code: ' . $errCode;
+                break;
         }
     }
 }
@@ -83,8 +114,8 @@ $banners = $bannerDAL->getAll();
                 </div>
 
                 <?php if ($message): ?>
-                <div style="padding:14px 20px; border-radius:10px; margin-bottom:20px; font-size:13px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">
-                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($message); ?>
+                <div style="padding:14px 20px; border-radius:10px; margin-bottom:20px; font-size:13px; background:<?php echo $messageType === 'error' ? '#fef2f2' : '#ecfdf5'; ?>; color:<?php echo $messageType === 'error' ? '#b91c1c' : '#065f46'; ?>; border:1px solid <?php echo $messageType === 'error' ? '#fecaca' : '#a7f3d0'; ?>;">
+                    <i class="fas fa-<?php echo $messageType === 'error' ? 'exclamation-circle' : 'check-circle'; ?>"></i> <?php echo htmlspecialchars($message); ?>
                 </div>
                 <?php endif; ?>
 

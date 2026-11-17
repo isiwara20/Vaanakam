@@ -19,8 +19,8 @@ unset($_SESSION['register_error'], $_SESSION['register_success'], $_SESSION['reg
         <div class="login-wrapper">
             <!-- Left: Register Form -->
             <div class="login-form-container">
-                <h1>Create Your Account</h1>
-                <p class="login-subtitle">Join VAANAKAM and start shopping for quality tech products</p>
+                <h1><?php echo __t('create_account'); ?></h1>
+                <p class="login-subtitle"><?php echo __t('register_subtitle'); ?></p>
 
                 <?php if ($registerError): ?>
                     <div class="alert alert-error">
@@ -40,41 +40,41 @@ unset($_SESSION['register_error'], $_SESSION['register_success'], $_SESSION['reg
                     <input type="hidden" name="action" value="register">
 
                     <div class="form-group">
-                        <label for="name">Full Name</label>
+                        <label for="name"><?php echo __t('full_name'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-user input-icon"></i>
                             <input type="text" id="name" name="name" 
-                                   placeholder="Enter your full name" 
+                                   placeholder="<?php echo htmlspecialchars(__t('enter_name_placeholder')); ?>" 
                                    value="<?php echo htmlspecialchars($registerName); ?>" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email Address</label>
+                        <label for="email"><?php echo __t('email_address'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-envelope input-icon"></i>
                             <input type="email" id="email" name="email" 
-                                   placeholder="Enter your email" 
+                                   placeholder="<?php echo htmlspecialchars(__t('enter_email_placeholder')); ?>" 
                                    value="<?php echo htmlspecialchars($registerEmail); ?>" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="phone">Phone Number</label>
+                        <label for="phone"><?php echo __t('phone_number'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-phone-alt input-icon"></i>
                             <input type="tel" id="phone" name="phone" 
-                                   placeholder="Enter your phone number" 
+                                   placeholder="<?php echo htmlspecialchars(__t('enter_phone_placeholder')); ?>" 
                                    value="<?php echo htmlspecialchars($registerPhone); ?>">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Password</label>
+                        <label for="password"><?php echo __t('password'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
                             <input type="password" id="password" name="password" 
-                                   placeholder="Create a password" required>
+                                   placeholder="<?php echo htmlspecialchars(__t('create_password_placeholder')); ?>" required>
                             <button type="button" class="toggle-password" onclick="togglePassword('password', 'eyeIcon1')">
                                 <i class="fas fa-eye" id="eyeIcon1"></i>
                             </button>
@@ -82,11 +82,11 @@ unset($_SESSION['register_error'], $_SESSION['register_success'], $_SESSION['reg
                     </div>
 
                     <div class="form-group">
-                        <label for="confirm_password">Confirm Password</label>
+                        <label for="confirm_password"><?php echo __t('confirm_password'); ?></label>
                         <div class="input-wrapper">
                             <i class="fas fa-lock input-icon"></i>
                             <input type="password" id="confirm_password" name="confirm_password" 
-                                   placeholder="Confirm your password" required>
+                                   placeholder="<?php echo htmlspecialchars(__t('confirm_password_placeholder')); ?>" required>
                             <button type="button" class="toggle-password" onclick="togglePassword('confirm_password', 'eyeIcon2')">
                                 <i class="fas fa-eye" id="eyeIcon2"></i>
                             </button>
@@ -96,25 +96,25 @@ unset($_SESSION['register_error'], $_SESSION['register_success'], $_SESSION['reg
                     <div class="form-options">
                         <label class="remember-me">
                             <input type="checkbox" name="terms" required>
-                            <span>I agree to the <a href="<?php echo BASE_URL; ?>terms.php" class="forgot-password">Terms & Conditions</a> and <a href="<?php echo BASE_URL; ?>privacy.php" class="forgot-password">Privacy Policy</a></span>
+                            <span><?php echo __t('agree_terms_prefix'); ?> <a href="<?php echo BASE_URL; ?>terms.php" class="forgot-password"><?php echo __t('terms_conditions'); ?></a> <?php echo __t('and'); ?> <a href="<?php echo BASE_URL; ?>privacy.php" class="forgot-password"><?php echo __t('privacy_policy'); ?></a></span>
                         </label>
                     </div>
 
                     <button type="submit" class="btn-login">
-                        <span>Create Account</span>
+                        <span><?php echo __t('create_account_btn'); ?></span>
                         <i class="fas fa-arrow-right"></i>
                     </button>
                 </form>
 
                 <p class="register-link">
-                    Already have an account? <a href="<?php echo BASE_URL; ?>login.php">Login Now</a>
+                    <?php echo __t('already_have_account'); ?> <a href="<?php echo BASE_URL; ?>login.php"><?php echo __t('login_now'); ?></a>
                 </p>
             </div>
 
             <!-- Right: Branding Panel -->
             <div class="login-brand-panel">
                 <?php echo render_asset_image('assets/images/login-couple2.png', [
-                    'alt' => 'Style That Defines You',
+                    'alt' => SITE_NAME,
                     'class' => 'brand-panel-img',
                     'fetchpriority' => 'high',
                     'loading' => 'eager',

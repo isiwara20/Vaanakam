@@ -213,7 +213,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] && (!isset($_SESSION
             <div class="top-bar-right">
                 <div class="top-bar-quick-links">
                     <a href="<?php echo BASE_URL; ?>track-order.php" class="top-link top-bar-track-link"><i class="fas fa-truck"></i> <span><?php echo __t('track_order'); ?></span></a>
-                    <a href="<?php echo BASE_URL; ?>warranty.php" class="top-link top-bar-warranty-link top-bar-hide-mobile"><i class="fas fa-shield-alt"></i> <span><?php echo __t('warranty'); ?></span></a>
                 </div>
                 <span class="top-bar-divider top-bar-hide-mobile"></span>
                 <a href="<?php echo BASE_URL; ?>contact.php" class="top-link top-bar-hide-mobile"><?php echo __t('help_center'); ?></a>
@@ -333,7 +332,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] && (!isset($_SESSION
                         <a href="<?php echo BASE_URL; ?>profile.php" class="profile-dropdown-item"><i class="fas fa-user"></i> <?php echo __t('my_profile'); ?></a>
                         <a href="<?php echo BASE_URL; ?>my-orders.php" class="profile-dropdown-item"><i class="fas fa-box"></i> <?php echo __t('my_orders'); ?></a>
                         <a href="<?php echo BASE_URL; ?>track-order.php" class="profile-dropdown-item"><i class="fas fa-truck"></i> <?php echo __t('track_order'); ?></a>
-                        <a href="<?php echo BASE_URL; ?>warranty.php" class="profile-dropdown-item"><i class="fas fa-shield-alt"></i> <?php echo __t('check_warranty'); ?></a>
                         <div class="profile-dropdown-divider"></div>
                         <a href="#" onclick="showLogoutConfirm(event)" class="profile-dropdown-item logout"><i class="fas fa-sign-out-alt"></i> <?php echo __t('logout'); ?></a>
                     </div>
@@ -402,10 +400,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] && (!isset($_SESSION
                 <a href="<?php echo BASE_URL; ?>track-order.php" class="mobile-menu-item">
                     <i class="fas fa-truck"></i>
                     <span><?php echo __t('track_order'); ?></span>
-                </a>
-                <a href="<?php echo BASE_URL; ?>warranty.php" class="mobile-menu-item">
-                    <i class="fas fa-shield-alt"></i>
-                    <span><?php echo __t('warranty'); ?></span>
                 </a>
                 <a href="<?php echo BASE_URL; ?>contact.php" class="mobile-menu-item">
                     <i class="fas fa-headset"></i>

@@ -22,8 +22,8 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
         <div class="login-wrapper">
             <!-- Left: Login Form -->
             <div class="login-form-container">
-                <h1>Welcome Back!</h1>
-                <p class="login-subtitle">Login to your VAANAKAM account</p>
+                <h1><?php echo __t('welcome_back'); ?></h1>
+                <p class="login-subtitle"><?php echo __t('login_subtitle'); ?></p>
 
                 <?php if ($loginError): ?>
                     <div class="alert alert-error login-inline-alert login-flash-alert" id="loginFlashAlert" role="alert">
@@ -33,10 +33,10 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                 <?php endif; ?>
 
                 <?php if ($altLoginEnabled): ?>
-                <div class="login-method-tabs" role="tablist" aria-label="Login method">
-                    <button type="button" class="login-method-tab is-active" data-login-tab="email" role="tab" aria-selected="true">Email</button>
+                <div class="login-method-tabs" role="tablist" aria-label="<?php echo __t('login'); ?>">
+                    <button type="button" class="login-method-tab is-active" data-login-tab="email" role="tab" aria-selected="true"><?php echo __t('email'); ?></button>
                     <?php if ($otpLoginEnabled): ?>
-                    <button type="button" class="login-method-tab" data-login-tab="phone" role="tab" aria-selected="false">Phone OTP</button>
+                    <button type="button" class="login-method-tab" data-login-tab="phone" role="tab" aria-selected="false"><?php echo __t('phone_otp'); ?></button>
                     <?php endif; ?>
                 </div>
                 <?php endif; ?>
@@ -47,21 +47,21 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                         <input type="hidden" name="action" value="login">
 
                         <div class="form-group">
-                            <label for="email">Email Address</label>
+                            <label for="email"><?php echo __t('email_address'); ?></label>
                             <div class="input-wrapper">
                                 <i class="fas fa-user input-icon"></i>
                                 <input type="email" id="email" name="email"
-                                       placeholder="Enter your email"
+                                       placeholder="<?php echo htmlspecialchars(__t('enter_email_placeholder')); ?>"
                                        value="<?php echo htmlspecialchars($loginEmail); ?>" required>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="password">Password</label>
+                            <label for="password"><?php echo __t('password'); ?></label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock input-icon"></i>
                                 <input type="password" id="password" name="password"
-                                       placeholder="Enter your password" required>
+                                       placeholder="<?php echo htmlspecialchars(__t('enter_password_placeholder')); ?>" required>
                                 <button type="button" class="toggle-password" onclick="togglePassword()">
                                     <i class="fas fa-eye" id="eyeIcon"></i>
                                 </button>
@@ -72,13 +72,13 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                             <label class="remember-me">
                                 <input type="checkbox" name="remember">
                                 <span class="checkmark"></span>
-                                Remember Me
+                                <?php echo __t('remember_me'); ?>
                             </label>
-                            <a href="<?php echo BASE_URL; ?>forgot-password.php" class="forgot-password">Forgot Password?</a>
+                            <a href="<?php echo BASE_URL; ?>forgot-password.php" class="forgot-password"><?php echo __t('forgot_password_q'); ?></a>
                         </div>
 
                         <button type="submit" class="btn-login">
-                            <span>Login</span>
+                            <span><?php echo __t('login'); ?></span>
                             <i class="fas fa-arrow-right"></i>
                         </button>
                     </form>
@@ -89,16 +89,16 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                     <form id="otpLoginForm" class="login-form" novalidate>
                         <div class="login-otp-field-stack">
                             <div class="form-group" id="otpPhoneGroup">
-                                <label for="otpPhone">Phone Number</label>
+                                <label for="otpPhone"><?php echo __t('phone_number'); ?></label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-phone-alt input-icon"></i>
                                     <input type="tel" id="otpPhone" name="phone" placeholder="07X XXX XXXX" autocomplete="tel" required>
                                 </div>
-                                <p class="login-field-hint">We will send a 6-digit code to verify your number.</p>
+                                <p class="login-field-hint"><?php echo __t('otp_hint'); ?></p>
                             </div>
 
                             <div class="form-group login-otp-code-slot" id="otpCodeGroup" aria-hidden="true">
-                                <label class="login-otp-code-label" id="otpCodeLabel">Verification Code</label>
+                                <label class="login-otp-code-label" id="otpCodeLabel"><?php echo __t('verification_code'); ?></label>
                                 <div class="login-otp-boxes" id="otpCodeBoxes" role="group" aria-labelledby="otpCodeLabel">
                                     <input type="text" class="login-otp-box" inputmode="numeric" maxlength="1" pattern="[0-9]" autocomplete="one-time-code" data-otp-index="0" disabled aria-label="Digit 1 of 6">
                                     <input type="text" class="login-otp-box" inputmode="numeric" maxlength="1" pattern="[0-9]" data-otp-index="1" disabled aria-label="Digit 2 of 6">
@@ -110,19 +110,19 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                             </div>
 
                             <div class="login-otp-profile-slot" id="otpProfileGroup" hidden>
-                                <p class="login-otp-profile-intro">New here? Enter your details to create your account.</p>
+                                <p class="login-otp-profile-intro"><?php echo __t('otp_new_user_intro'); ?></p>
                                 <div class="form-group login-otp-profile-field">
-                                    <label for="otpName">Full Name</label>
+                                    <label for="otpName"><?php echo __t('full_name'); ?></label>
                                     <div class="input-wrapper">
                                         <i class="fas fa-user input-icon"></i>
-                                        <input type="text" id="otpName" name="name" placeholder="Enter your full name" autocomplete="name">
+                                        <input type="text" id="otpName" name="name" placeholder="<?php echo htmlspecialchars(__t('enter_name_placeholder')); ?>" autocomplete="name">
                                     </div>
                                 </div>
                                 <div class="form-group login-otp-profile-field">
-                                    <label for="otpEmail">Email Address</label>
+                                    <label for="otpEmail"><?php echo __t('email_address'); ?></label>
                                     <div class="input-wrapper">
                                         <i class="fas fa-envelope input-icon"></i>
-                                        <input type="email" id="otpEmail" name="email" placeholder="Enter your email address" autocomplete="email">
+                                        <input type="email" id="otpEmail" name="email" placeholder="<?php echo htmlspecialchars(__t('enter_email_placeholder')); ?>" autocomplete="email">
                                     </div>
                                 </div>
                             </div>
@@ -136,14 +136,14 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
 
                         <div class="login-otp-actions">
                             <button type="button" class="btn-login" id="otpSendBtn">
-                                <span>Send OTP</span>
+                                <span><?php echo __t('send_otp'); ?></span>
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                             <button type="button" class="btn-login btn-login-secondary" id="otpVerifyBtn" hidden>
-                                <span>Verify &amp; Login</span>
+                                <span><?php echo __t('verify_login'); ?></span>
                                 <i class="fas fa-check"></i>
                             </button>
-                            <button type="button" class="login-otp-back" id="otpChangePhoneBtn" hidden>Change phone number</button>
+                            <button type="button" class="login-otp-back" id="otpChangePhoneBtn" hidden><?php echo __t('change_phone_number'); ?></button>
                         </div>
                     </form>
                 </div>
@@ -151,14 +151,14 @@ unset($_SESSION['login_error'], $_SESSION['login_email']);
                 </div>
 
                 <p class="register-link">
-                    Don't have an account? <a href="<?php echo BASE_URL; ?>register.php">Register Now</a>
+                    <?php echo __t('no_account'); ?> <a href="<?php echo BASE_URL; ?>register.php"><?php echo __t('register_now'); ?></a>
                 </p>
             </div>
 
             <!-- Right: Branding Panel -->
             <div class="login-brand-panel">
                 <?php echo render_asset_image('assets/images/login-couple.png', [
-                    'alt' => 'Style That Defines You',
+                    'alt' => SITE_NAME,
                     'class' => 'brand-panel-img',
                     'fetchpriority' => 'high',
                     'loading' => 'eager',

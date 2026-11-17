@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/app.php';
-$pageTitle = "Reset Password - " . SITE_NAME;
+$pageTitle = __t('reset_password') . " - " . SITE_NAME;
 $pagePreloadImages = [asset_image_url('assets/images/login-couple3.png')];
 require_once __DIR__ . '/partials/header.php';
 
@@ -26,8 +26,8 @@ if (empty($token)) {
                         <i class="fas fa-key"></i>
                     </span>
                 </div>
-                <h1>Reset Password</h1>
-                <p class="login-subtitle">Enter your new password below.</p>
+                <h1><?php echo __t('reset_password'); ?></h1>
+                <p class="login-subtitle"><?php echo __t('reset_password_desc'); ?></p>
 
                 <?php if ($resetError): ?>
                     <div class="alert alert-error">
@@ -43,7 +43,7 @@ if (empty($token)) {
                     </div>
                     <div class="back-to-login">
                         <a href="<?php echo BASE_URL; ?>login.php">
-                            <i class="fas fa-arrow-left"></i> Go to Login
+                            <i class="fas fa-arrow-left"></i> <?php echo __t('go_to_login'); ?>
                         </a>
                     </div>
                 <?php elseif (!empty($token)): ?>
@@ -52,7 +52,7 @@ if (empty($token)) {
                         <input type="hidden" name="token" value="<?php echo htmlspecialchars($token); ?>">
 
                         <div class="form-group">
-                            <label for="password">New Password</label>
+                            <label for="password"><?php echo __t('new_password'); ?></label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock input-icon"></i>
                                 <input type="password" id="password" name="password" 
@@ -64,7 +64,7 @@ if (empty($token)) {
                         </div>
 
                         <div class="form-group">
-                            <label for="confirm_password">Confirm New Password</label>
+                            <label for="confirm_password"><?php echo __t('confirm_new_password'); ?></label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock input-icon"></i>
                                 <input type="password" id="confirm_password" name="confirm_password" 
@@ -76,13 +76,13 @@ if (empty($token)) {
                         </div>
 
                         <button type="submit" class="btn-login">
-                            Reset Password <i class="fas fa-check"></i>
+                            <?php echo __t('reset_password'); ?> <i class="fas fa-check"></i>
                         </button>
                     </form>
 
                     <div class="back-to-login">
                         <a href="<?php echo BASE_URL; ?>login.php">
-                            <i class="fas fa-arrow-left"></i> Back to Login
+                            <i class="fas fa-arrow-left"></i> <?php echo __t('back_to_login'); ?>
                         </a>
                     </div>
                 <?php endif; ?>
@@ -91,7 +91,7 @@ if (empty($token)) {
             <!-- Right: Branding Panel -->
             <div class="login-brand-panel">
                 <?php echo render_asset_image('assets/images/login-couple3.png', [
-                    'alt' => 'Style That Defines You',
+                    'alt' => SITE_NAME,
                     'class' => 'brand-panel-img',
                     'fetchpriority' => 'high',
                     'loading' => 'eager',

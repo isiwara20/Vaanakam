@@ -554,7 +554,7 @@ $slLocationsJson = json_encode(ezymart_sl_locations_for_js(), JSON_UNESCAPED_UNI
                         <div class="checkout-item-img" style="display:flex; align-items:center; justify-content:center; background:#f8f8f8; color:#ccc;"><i class="fas fa-tshirt"></i></div>
                         <?php endif; ?>
                         <div class="checkout-item-info">
-                            <h4><?php echo htmlspecialchars(translate_product_name($item['name'])); ?></h4>
+                            <h4><?php echo htmlspecialchars(translate_product_name($item['name'], $item['name_ta'] ?? null)); ?></h4>
                             <span><?php echo __t('qty'); ?>: <?php echo $item['quantity']; ?></span>
                         </div>
                         <span class="checkout-item-price"><?php echo format_price($item['price'] * $item['quantity']); ?></span>

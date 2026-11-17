@@ -122,9 +122,6 @@ $activeSection = $_GET['section'] ?? 'profile';
                         <a href="<?php echo BASE_URL; ?>my-orders.php" class="profile-nav-item">
                             <i class="fas fa-box"></i> My Orders
                         </a>
-                        <a href="<?php echo BASE_URL; ?>my-warranty-claims.php" class="profile-nav-item">
-                            <i class="fas fa-shield-alt"></i> Warranty Claims
-                        </a>
                         <a href="<?php echo BASE_URL; ?>wishlist.php" class="profile-nav-item">
                             <i class="far fa-heart"></i> Wishlist
                         </a>

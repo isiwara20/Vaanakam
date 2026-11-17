@@ -5,7 +5,7 @@
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/dal/OrderDAL.php';
 
-$pageTitle = "Track Order - " . SITE_NAME;
+$pageTitle = __t('track_order') . " - " . SITE_NAME;
 $order = null;
 $items = [];
 $searched = false;
@@ -26,11 +26,11 @@ require_once __DIR__ . '/views/partials/header.php';
 ?>
 
 <style>
-/* ===== Track Order - VAANAKAM Theme ===== */
+/* ===== Track Order - VAANAKAM Fresh Green Theme ===== */
 .track-hero {
     position: relative;
     padding: clamp(40px, 6vw, 56px) 0 clamp(48px, 7vw, 64px);
-    background: #D49A0A;
+    background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
     overflow: hidden;
     text-align: center;
     color: #fff;
@@ -47,22 +47,22 @@ require_once __DIR__ . '/views/partials/header.php';
     height: min(400px, 80vw);
     top: -160px;
     right: -100px;
-    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.14) 0%, transparent 70%);
 }
 .track-hero::after {
     width: min(300px, 60vw);
     height: min(300px, 60vw);
     bottom: -120px;
     left: -60px;
-    background: radial-gradient(circle, rgba(236,72,153,0.12) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(34,197,94,0.2) 0%, transparent 70%);
 }
 .track-hero-inner { position: relative; z-index: 1; max-width: 560px; margin: 0 auto; }
 .track-hero-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255,255,255,0.14);
-    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.28);
     backdrop-filter: blur(8px);
     padding: 8px 18px;
     border-radius: 999px;
@@ -81,7 +81,7 @@ require_once __DIR__ . '/views/partials/header.php';
 }
 .track-hero p {
     font-size: clamp(13px, 2vw, 15px);
-    color: rgba(255,255,255,0.88);
+    color: rgba(255,255,255,0.92);
     line-height: 1.65;
     margin: 0;
 }
@@ -97,34 +97,34 @@ require_once __DIR__ . '/views/partials/header.php';
 /* Search Form */
 .track-search {
     background: #fff;
-    border: 1px solid #F5E6B8;
+    border: 1px solid #DCFCE7;
     border-radius: 16px;
     padding: 28px 30px;
     margin-bottom: 24px;
-    box-shadow: 0 8px 32px rgba(196, 138, 10, 0.1);
+    box-shadow: 0 8px 32px rgba(22, 163, 74, 0.08);
 }
 .track-search-form { display: flex; gap: 12px; }
 .track-search-form input {
     flex: 1;
     padding: 15px 20px;
-    border: 1.5px solid #F5E6B8;
+    border: 1.5px solid #DCFCE7;
     border-radius: 12px;
     font-size: 14px;
     font-family: 'Poppins', sans-serif;
     outline: none;
     text-transform: uppercase;
     transition: all 0.3s;
-    background: #FFF8E6;
+    background: #F0FDF4;
 }
 .track-search-form input:focus {
-    border-color: #E5A91A;
+    border-color: #16A34A;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(229, 169, 26, 0.12);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 .track-search-form input::placeholder { text-transform: none; color: #aaa; }
 .track-search-form button {
     padding: 15px 32px;
-    background: #D49A0A;
+    background: #16A34A;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -136,22 +136,22 @@ require_once __DIR__ . '/views/partials/header.php';
     align-items: center;
     gap: 8px;
     transition: all 0.3s;
-    box-shadow: 0 4px 16px rgba(229, 169, 26, 0.25);
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25);
     white-space: nowrap;
 }
 .track-search-form button:hover {
-    background: #D4A017;
-    box-shadow: 0 6px 22px rgba(229, 169, 26, 0.35);
+    background: #15803D;
+    box-shadow: 0 6px 22px rgba(22, 163, 74, 0.35);
     transform: translateY(-1px);
 }
 
 /* Cards */
 .track-result {
     background: #fff;
-    border: 1px solid #F5E6B8;
+    border: 1px solid #DCFCE7;
     border-radius: 16px;
     padding: 32px;
-    box-shadow: 0 4px 20px rgba(196, 138, 10, 0.06);
+    box-shadow: 0 4px 20px rgba(22, 163, 74, 0.06);
 }
 .track-order-header {
     display: flex;
@@ -159,13 +159,13 @@ require_once __DIR__ . '/views/partials/header.php';
     align-items: center;
     margin-bottom: 8px;
     padding-bottom: 18px;
-    border-bottom: 1px solid #FFE8A8;
+    border-bottom: 1px solid #DCFCE7;
 }
-.track-order-header h2 { font-size: 18px; font-weight: 700; color: #D4A017; }
+.track-order-header h2 { font-size: 18px; font-weight: 700; color: #15803D; }
 .track-order-header .order-date {
     font-size: 12px;
-    color: #D4A017;
-    background: #FFE8A8;
+    color: #15803D;
+    background: #DCFCE7;
     padding: 6px 14px;
     border-radius: 20px;
     font-weight: 500;
@@ -186,7 +186,7 @@ require_once __DIR__ . '/views/partials/header.php';
     left: 50px;
     right: 50px;
     height: 4px;
-    background: #FFF3D6;
+    background: #DCFCE7;
     z-index: 1;
     border-radius: 4px;
 }
@@ -196,7 +196,7 @@ require_once __DIR__ . '/views/partials/header.php';
     top: 24px;
     left: 50px;
     height: 4px;
-    background: #D49A0A;
+    background: #16A34A;
     z-index: 2;
     border-radius: 4px;
     animation: progressGrow 1.2s ease-out forwards;
@@ -217,32 +217,32 @@ require_once __DIR__ . '/views/partials/header.php';
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #FFF8E6;
-    border: 3px solid #F5E6B8;
+    background: #F0FDF4;
+    border: 3px solid #DCFCE7;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 12px;
     font-size: 16px;
-    color: #c4b5fd;
+    color: #86EFAC;
     transition: all 0.4s ease;
-    box-shadow: 0 2px 8px rgba(196, 138, 10, 0.06);
+    box-shadow: 0 2px 8px rgba(22, 163, 74, 0.06);
 }
 .timeline-step.active .timeline-dot {
-    background: #D49A0A;
-    border-color: #E5A91A;
+    background: #16A34A;
+    border-color: #15803D;
     color: #fff;
-    box-shadow: 0 4px 16px rgba(229, 169, 26, 0.35);
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.35);
     animation: dotPulse 0.6s ease-out;
 }
-.timeline-step.active .timeline-label { color: #D4A017; font-weight: 600; }
+.timeline-step.active .timeline-label { color: #15803D; font-weight: 600; }
 .timeline-step.cancelled .timeline-dot {
     background: #ef4444;
     border-color: #ef4444;
     color: #fff;
     box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
-.timeline-label { font-size: 12px; color: #999; font-weight: 500; }
+.timeline-label { font-size: 12px; color: #64748B; font-weight: 500; }
 
 @keyframes dotPulse {
     0% { transform: scale(0.5); opacity: 0; }
@@ -258,80 +258,80 @@ require_once __DIR__ . '/views/partials/header.php';
 /* Order Details */
 .track-details { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
 .track-detail-card {
-    background: #FFF8E6;
+    background: #F0FDF4;
     border-radius: 12px;
     padding: 20px;
-    border: 1px solid #F5E6B8;
+    border: 1px solid #DCFCE7;
 }
 .track-detail-card h4 {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: #E5A91A;
+    color: #16A34A;
     margin-bottom: 12px;
     font-weight: 700;
 }
 .track-detail-card p { font-size: 13px; color: #333; line-height: 1.7; }
-.track-detail-card p strong { color: #D4A017; }
+.track-detail-card p strong { color: #15803D; }
 
 /* Order Items */
 .track-items h3 {
     font-size: 14px;
     font-weight: 600;
-    color: #D4A017;
+    color: #15803D;
     margin-bottom: 14px;
     padding-top: 16px;
-    border-top: 1px solid #FFE8A8;
+    border-top: 1px solid #DCFCE7;
 }
 .track-item {
     display: flex;
     align-items: center;
     gap: 14px;
     padding: 14px;
-    border: 1px solid #F5E6B8;
+    border: 1px solid #DCFCE7;
     border-radius: 10px;
     margin-bottom: 10px;
     background: #fff;
     transition: border-color 0.2s, background 0.2s;
 }
-.track-item:hover { border-color: #F0D78C; background: #FFF8E6; }
+.track-item:hover { border-color: #86EFAC; background: #F0FDF4; }
 .track-item-img {
     width: 50px;
     height: 50px;
     border-radius: 10px;
     object-fit: cover;
-    border: 1px solid #F5E6B8;
-    background: #FFF8E6;
+    border: 1px solid #DCFCE7;
+    background: #F0FDF4;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #c4b5fd;
+    color: #16A34A;
     font-size: 18px;
     flex-shrink: 0;
 }
 .track-item-info { flex: 1; }
 .track-item-info h4 { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 2px; }
 .track-item-info span { font-size: 11px; color: #888; }
-.track-item-price { font-size: 14px; font-weight: 700; color: #D4A017; white-space: nowrap; }
+.track-item-price { font-size: 14px; font-weight: 700; color: #16A34A; white-space: nowrap; }
 
 /* Empty / Info State */
 .track-info-state { text-align: center; padding: 40px 28px; }
 .track-info-icon {
     width: 72px;
     height: 72px;
-    background: #FFF3D6;
+    background: #DCFCE7;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 20px;
-    border: 2px solid #F5E6B8;
+    border: 2px solid #BBF7D0;
 }
-.track-info-icon i { font-size: 28px; color: #E5A91A; }
-.track-info-state h3 { font-size: 16px; font-weight: 700; color: #D4A017; margin-bottom: 8px; }
+.track-info-icon i { font-size: 28px; color: #16A34A; }
+.track-info-state h3 { font-size: 16px; font-weight: 700; color: #15803D; margin-bottom: 8px; }
 .track-info-state > p {
     font-size: 13px;
-    color: #888;
+    color: #64748B;
     max-width: 400px;
     margin: 0 auto 28px;
     line-height: 1.7;
@@ -348,11 +348,11 @@ require_once __DIR__ . '/views/partials/header.php';
     margin: 0 auto 8px;
     font-size: 18px;
 }
-.track-info-step-icon.purple { background: #FFE8A8; color: #E5A91A; }
-.track-info-step-icon.violet { background: #FFF3D6; color: #D4A017; }
-.track-info-step-icon.lavender { background: #FFF8E6; color: #E5A91A; border: 1px solid #F5E6B8; }
+.track-info-step-icon.purple { background: #DCFCE7; color: #15803D; }
+.track-info-step-icon.violet { background: #F0FDF4; color: #16A34A; border: 1px solid #DCFCE7; }
+.track-info-step-icon.lavender { background: #F0FDF4; color: #15803D; border: 1px solid #DCFCE7; }
 .track-info-step-icon.done { background: #ecfdf5; color: #16a34a; }
-.track-info-step span { font-size: 11px; color: #666; font-weight: 500; }
+.track-info-step span { font-size: 11px; color: #64748B; font-weight: 500; }
 
 .track-help-link {
     display: inline-flex;
@@ -361,40 +361,40 @@ require_once __DIR__ . '/views/partials/header.php';
     margin-top: 24px;
     font-size: 12px;
     font-weight: 600;
-    color: #E5A91A;
+    color: #16A34A;
     text-decoration: none;
 }
-.track-help-link:hover { color: #D4A017; }
+.track-help-link:hover { color: #15803D; }
 
 /* Testimonial */
 .track-testimonial { margin-top: 20px; }
 .track-testimonial h3 {
     font-size: 15px;
     font-weight: 600;
-    color: #D4A017;
+    color: #15803D;
     margin-bottom: 6px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
-.track-testimonial h3 i { color: #E5A91A; }
+.track-testimonial h3 i { color: #16A34A; }
 .track-testimonial > p { font-size: 12px; color: #888; margin-bottom: 18px; }
 .track-testimonial textarea {
     width: 100%;
     padding: 12px 14px;
-    border: 1.5px solid #F5E6B8;
+    border: 1.5px solid #DCFCE7;
     border-radius: 10px;
     font-family: 'Poppins', sans-serif;
     font-size: 13px;
     outline: none;
     resize: vertical;
-    background: #FFF8E6;
+    background: #F0FDF4;
     transition: all 0.3s;
 }
 .track-testimonial textarea:focus {
-    border-color: #E5A91A;
+    border-color: #16A34A;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(229, 169, 26, 0.1);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12);
 }
 .track-testimonial label { font-size: 12px; font-weight: 600; color: #333; display: block; margin-bottom: 6px; }
 .btn-track-submit {
@@ -402,7 +402,7 @@ require_once __DIR__ . '/views/partials/header.php';
     align-items: center;
     gap: 8px;
     padding: 11px 24px;
-    background: #D49A0A;
+    background: #16A34A;
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -413,8 +413,8 @@ require_once __DIR__ . '/views/partials/header.php';
     transition: all 0.3s;
 }
 .btn-track-submit:hover {
-    background: #D4A017;
-    box-shadow: 0 4px 16px rgba(229, 169, 26, 0.25);
+    background: #15803D;
+    box-shadow: 0 4px 16px rgba(22, 163, 74, 0.25);
     transform: translateY(-1px);
 }
 .track-success-msg {
@@ -436,8 +436,8 @@ require_once __DIR__ . '/views/partials/header.php';
 
 /* Not Found */
 .track-not-found { text-align: center; padding: 40px; }
-.track-not-found i { font-size: 3rem; color: #F0D78C; margin-bottom: 14px; }
-.track-not-found h3 { font-size: 16px; color: #D4A017; margin-bottom: 6px; }
+.track-not-found i { font-size: 3rem; color: #86EFAC; margin-bottom: 14px; }
+.track-not-found h3 { font-size: 16px; color: #15803D; margin-bottom: 6px; }
 .track-not-found p { font-size: 13px; color: #888; }
 
 @media (max-width: 768px) {
@@ -475,9 +475,9 @@ require_once __DIR__ . '/views/partials/header.php';
 <!-- Breadcrumb -->
 <div class="product-page-breadcrumb">
     <div class="container">
-        <a href="<?php echo BASE_URL; ?>">Home</a>
+        <a href="<?php echo BASE_URL; ?>"><?php echo __t('home'); ?></a>
         <span class="separator"><i class="fas fa-chevron-right"></i></span>
-        <span>Track Order</span>
+        <span><?php echo __t('track_order'); ?></span>
     </div>
 </div>
 
@@ -485,9 +485,9 @@ require_once __DIR__ . '/views/partials/header.php';
 <header class="track-hero">
     <div class="container">
         <div class="track-hero-inner">
-            <span class="track-hero-badge"><i class="fas fa-shipping-fast"></i> Order Tracking</span>
-            <h1>Track Your Order</h1>
-            <p>Enter your order number to check delivery status in real-time</p>
+            <span class="track-hero-badge"><i class="fas fa-shipping-fast"></i> <?php echo __t('order_tracking'); ?></span>
+            <h1><?php echo __t('track_your_order'); ?></h1>
+            <p><?php echo __t('track_order_subtitle'); ?></p>
         </div>
     </div>
 </header>
@@ -498,8 +498,8 @@ require_once __DIR__ . '/views/partials/header.php';
             <!-- Search -->
             <div class="track-search">
                 <form method="GET" class="track-search-form">
-                    <input type="text" name="order_number" placeholder="Enter Order Number (e.g. AB250612XXXX)" value="<?php echo htmlspecialchars($_GET['order_number'] ?? ''); ?>" required>
-                    <button type="submit"><i class="fas fa-search"></i> Track</button>
+                    <input type="text" name="order_number" placeholder="<?php echo htmlspecialchars(__t('enter_order_number')); ?>" value="<?php echo htmlspecialchars($_GET['order_number'] ?? ''); ?>" required>
+                    <button type="submit"><i class="fas fa-search"></i> <?php echo __t('track_order_btn'); ?></button>
                 </form>
             </div>
 
@@ -509,29 +509,29 @@ require_once __DIR__ . '/views/partials/header.php';
                 <div class="track-info-icon">
                     <i class="fas fa-truck"></i>
                 </div>
-                <h3>Where's my order?</h3>
-                <p>Enter your order number above to track your delivery status in real-time. You can find your order number in the confirmation email or your account orders page.</p>
+                <h3><?php echo __t('wheres_my_order'); ?></h3>
+                <p><?php echo __t('track_order_info_desc'); ?></p>
                 <div class="track-info-steps">
                     <div class="track-info-step">
                         <div class="track-info-step-icon purple"><i class="fas fa-box"></i></div>
-                        <span>Order Placed</span>
+                        <span><?php echo __t('order_placed'); ?></span>
                     </div>
                     <div class="track-info-step">
                         <div class="track-info-step-icon violet"><i class="fas fa-cog"></i></div>
-                        <span>Processing</span>
+                        <span><?php echo __t('status_processing'); ?></span>
                     </div>
                     <div class="track-info-step">
                         <div class="track-info-step-icon lavender"><i class="fas fa-shipping-fast"></i></div>
-                        <span>Shipped</span>
+                        <span><?php echo __t('status_shipped'); ?></span>
                     </div>
                     <div class="track-info-step">
                         <div class="track-info-step-icon done"><i class="fas fa-check-circle"></i></div>
-                        <span>Delivered</span>
+                        <span><?php echo __t('status_delivered'); ?></span>
                     </div>
                 </div>
                 <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
                 <a href="<?php echo BASE_URL; ?>my-orders.php" class="track-help-link">
-                    <i class="fas fa-list-alt"></i> View all orders in My Account
+                    <i class="fas fa-list-alt"></i> <?php echo __t('view_all_orders_link'); ?>
                 </a>
                 <?php endif; ?>
             </div>
@@ -542,7 +542,7 @@ require_once __DIR__ . '/views/partials/header.php';
             <div class="track-result">
                 <div class="track-order-header">
                     <h2>Order #<?php echo htmlspecialchars($order['order_number']); ?></h2>
-                    <span class="order-date">Placed on <?php echo date('M d, Y', strtotime($order['created_at'])); ?></span>
+                    <span class="order-date"><?php echo __t('placed_on'); ?> <?php echo date('M d, Y', strtotime($order['created_at'])); ?></span>
                 </div>
 
                 <!-- Status Timeline -->
@@ -555,32 +555,32 @@ require_once __DIR__ . '/views/partials/header.php';
                 <div class="status-timeline <?php echo $stepClass; ?>">
                     <div class="timeline-step <?php echo $currentStep >= 1 && !$isCancelled ? 'active' : ''; ?> <?php echo $isCancelled ? 'cancelled' : ''; ?>">
                         <div class="timeline-dot"><i class="fas fa-clipboard-check"></i></div>
-                        <span class="timeline-label">Order Placed</span>
+                        <span class="timeline-label"><?php echo __t('order_placed'); ?></span>
                     </div>
                     <div class="timeline-step <?php echo $currentStep >= 2 && !$isCancelled ? 'active' : ''; ?>">
                         <div class="timeline-dot"><i class="fas fa-cog"></i></div>
-                        <span class="timeline-label">Processing</span>
+                        <span class="timeline-label"><?php echo __t('status_processing'); ?></span>
                     </div>
                     <div class="timeline-step <?php echo $currentStep >= 3 && !$isCancelled ? 'active' : ''; ?>">
                         <div class="timeline-dot"><i class="fas fa-truck"></i></div>
-                        <span class="timeline-label">Shipped</span>
+                        <span class="timeline-label"><?php echo __t('status_shipped'); ?></span>
                     </div>
                     <div class="timeline-step <?php echo $currentStep >= 4 && !$isCancelled ? 'active' : ''; ?>">
                         <div class="timeline-dot"><i class="fas fa-check-circle"></i></div>
-                        <span class="timeline-label">Delivered</span>
+                        <span class="timeline-label"><?php echo __t('status_delivered'); ?></span>
                     </div>
                 </div>
 
                 <?php if ($isCancelled): ?>
                 <div style="text-align:center; background:#fef2f2; padding:14px; border-radius:10px; margin-bottom:20px;">
-                    <p style="color:#ef4444; font-size:13px; font-weight:600;"><i class="fas fa-times-circle"></i> This order has been cancelled.</p>
+                    <p style="color:#ef4444; font-size:13px; font-weight:600;"><i class="fas fa-times-circle"></i> <?php echo __t('order_cancelled_notice'); ?></p>
                 </div>
                 <?php endif; ?>
 
                 <!-- Details -->
                 <div class="track-details">
                     <div class="track-detail-card">
-                        <h4>Delivery Address</h4>
+                        <h4><?php echo __t('delivery_address'); ?></h4>
                         <p>
                             <strong><?php echo htmlspecialchars($order['full_name']); ?></strong><br>
                             <?php echo htmlspecialchars($order['address_1']); ?><br>
@@ -588,24 +588,24 @@ require_once __DIR__ . '/views/partials/header.php';
                         </p>
                     </div>
                     <div class="track-detail-card">
-                        <h4>Order Info</h4>
+                        <h4><?php echo __t('order_info'); ?></h4>
                         <p>
-                            <strong>Payment:</strong> <?php echo $order['payment_method'] === 'cod' ? 'Cash on Delivery' : 'Card Payment'; ?><br>
-                            <strong>Status:</strong> <?php echo ucfirst($order['payment_status']); ?><br>
-                            <strong>Total:</strong> LKR <?php echo number_format($order['total'], 0); ?>
+                            <strong><?php echo __t('payment'); ?>:</strong> <?php echo $order['payment_method'] === 'cod' ? __t('cash_on_delivery') : __t('card_payment'); ?><br>
+                            <strong><?php echo __t('status'); ?>:</strong> <?php echo htmlspecialchars($order['payment_status'] === 'paid' ? __t('paid') : __t('status_pending')); ?><br>
+                            <strong><?php echo __t('total'); ?>:</strong> LKR <?php echo number_format($order['total'], 0); ?>
                         </p>
                     </div>
                 </div>
 
                 <!-- Items -->
                 <div class="track-items">
-                    <h3>Order Items</h3>
+                    <h3><?php echo __t('order_items'); ?></h3>
                     <?php foreach ($items as $item): ?>
                     <div class="track-item">
-                        <div class="track-item-img"><i class="fas fa-tshirt"></i></div>
+                        <div class="track-item-img"><i class="fas fa-box"></i></div>
                         <div class="track-item-info">
-                            <h4><?php echo htmlspecialchars($item['product_name']); ?></h4>
-                            <span>Qty: <?php echo $item['quantity']; ?></span>
+                            <h4><?php echo htmlspecialchars(translate_product_name($item['product_name'])); ?></h4>
+                            <span><?php echo __t('qty'); ?>: <?php echo $item['quantity']; ?></span>
                         </div>
                         <span class="track-item-price">LKR <?php echo number_format($item['total'], 0); ?></span>
                     </div>
@@ -633,19 +633,19 @@ require_once __DIR__ . '/views/partials/header.php';
             }
             ?>
             <div class="track-result track-testimonial">
-                <h3><i class="fas fa-comment-dots"></i> Share Your Experience</h3>
-                <p>How was your experience with <?php echo SITE_NAME; ?>? Your feedback helps us improve!</p>
+                <h3><i class="fas fa-comment-dots"></i> <?php echo __t('share_experience'); ?></h3>
+                <p><?php echo __t('share_experience_desc', ['store' => SITE_NAME]); ?></p>
                 
                 <?php if ($testimonialSuccess): ?>
                 <div class="track-success-msg">
-                    <i class="fas fa-check-circle"></i> Thank you! Your testimonial has been submitted and is pending approval.
+                    <i class="fas fa-check-circle"></i> <?php echo __t('testimonial_thanks'); ?>
                 </div>
                 <?php else: ?>
                 <form method="POST" action="<?php echo BASE_URL; ?>track-order.php?order_number=<?php echo htmlspecialchars($order['order_number']); ?>">
                     <input type="hidden" name="testimonial_action" value="submit">
                     
                     <div style="margin-bottom:14px;">
-                        <label>Your Rating</label>
+                        <label><?php echo __t('your_rating'); ?></label>
                         <div class="testimonial-stars">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
                             <input type="radio" name="t_rating" value="<?php echo $i; ?>" id="tstar<?php echo $i; ?>" <?php echo $i === 5 ? 'checked' : ''; ?>>
@@ -655,12 +655,12 @@ require_once __DIR__ . '/views/partials/header.php';
                     </div>
 
                     <div style="margin-bottom:14px;">
-                        <label>Your Message</label>
+                        <label><?php echo __t('your_message'); ?></label>
                         <textarea name="t_message" rows="3" required placeholder="Tell us about your experience..."></textarea>
                     </div>
 
                     <button type="submit" class="btn-track-submit">
-                        <i class="fas fa-paper-plane"></i> Submit Testimonial
+                        <i class="fas fa-paper-plane"></i> <?php echo __t('submit_testimonial'); ?>
                     </button>
                 </form>
                 <?php endif; ?>
@@ -671,8 +671,8 @@ require_once __DIR__ . '/views/partials/header.php';
             <div class="track-result">
                 <div class="track-not-found">
                     <i class="fas fa-search"></i>
-                    <h3>Order Not Found</h3>
-                    <p>We couldn't find an order with that number. Please check and try again.</p>
+                    <h3><?php echo __t('order_not_found'); ?></h3>
+                    <p><?php echo __t('order_not_found_desc'); ?></p>
                 </div>
             </div>
             <?php endif; ?>

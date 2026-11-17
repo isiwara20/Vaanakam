@@ -622,11 +622,11 @@ $isAllProductsView = $viewAllProducts && empty($selectedCategory) && empty($sear
             <?php elseif ($catInfo): ?>
             <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
             <?php if (!empty($subInfo)): ?>
-            <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($catInfo['slug']); ?>"><?php echo htmlspecialchars(translate_text($catInfo['name'])); ?></a>
+            <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($catInfo['slug']); ?>"><?php echo htmlspecialchars(translate_text($catInfo['name'], $catInfo['name_ta'] ?? null)); ?></a>
             <span class="breadcrumb-sep"><i class="fas fa-chevron-right"></i></span>
-            <span class="breadcrumb-current"><?php echo htmlspecialchars(translate_text($subInfo['name'])); ?></span>
+            <span class="breadcrumb-current"><?php echo htmlspecialchars(translate_text($subInfo['name'], $subInfo['name_ta'] ?? null)); ?></span>
             <?php else: ?>
-            <span class="breadcrumb-current"><?php echo htmlspecialchars(translate_text($catInfo['name'])); ?></span>
+            <span class="breadcrumb-current"><?php echo htmlspecialchars(translate_text($catInfo['name'], $catInfo['name_ta'] ?? null)); ?></span>
             <?php endif; ?>
             <?php endif; ?>
         </nav>
@@ -659,7 +659,7 @@ $isAllProductsView = $viewAllProducts && empty($selectedCategory) && empty($sear
                         <li>
                             <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($cat['slug']); ?>" 
                                class="<?php echo ($selectedCategory === $cat['slug']) ? 'active' : ''; ?>">
-                                <span><?php echo htmlspecialchars(translate_text($cat['name'])); ?></span>
+                                <span><?php echo htmlspecialchars(translate_text($cat['name'], $cat['name_ta'] ?? null)); ?></span>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -682,9 +682,9 @@ $isAllProductsView = $viewAllProducts && empty($selectedCategory) && empty($sear
                         if ($isHotDealsView) {
                             echo __t('hot_deals');
                         } elseif (!empty($subInfo)) {
-                            echo htmlspecialchars(translate_text($subInfo['name']));
+                            echo htmlspecialchars(translate_text($subInfo['name'], $subInfo['name_ta'] ?? null));
                         } elseif ($catInfo) {
-                            echo htmlspecialchars(translate_text($catInfo['name']));
+                            echo htmlspecialchars(translate_text($catInfo['name'], $catInfo['name_ta'] ?? null));
                         } elseif ($searchQuery) {
                             echo __t('search_results');
                         } elseif ($isAllProductsView) {
@@ -720,7 +720,7 @@ $isAllProductsView = $viewAllProducts && empty($selectedCategory) && empty($sear
                             <div class="shop-category-card-icon"><i class="fas fa-microchip"></i></div>
                             <?php endif; ?>
                             <div class="shop-category-card-bottom">
-                                <span class="shop-category-card-name"><?php echo htmlspecialchars(translate_text($cat['name'])); ?></span>
+                                <span class="shop-category-card-name"><?php echo htmlspecialchars(translate_text($cat['name'], $cat['name_ta'] ?? null)); ?></span>
                                 <span class="shop-category-card-link"><?php echo __t('shop_now'); ?> <i class="fas fa-arrow-right"></i></span>
                             </div>
                         </a>
@@ -748,7 +748,7 @@ $isAllProductsView = $viewAllProducts && empty($selectedCategory) && empty($sear
                             <div class="subcategory-placeholder"><i class="fas fa-tshirt"></i></div>
                             <?php endif; ?>
                             <div class="subcategory-overlay">
-                                <h4><?php echo htmlspecialchars(translate_text($subItem['name'])); ?></h4>
+                                <h4><?php echo htmlspecialchars(translate_text($subItem['name'], $subItem['name_ta'] ?? null)); ?></h4>
                                 <span class="subcategory-explore"><?php echo __t('explore'); ?> <i class="fas fa-arrow-right"></i></span>
                             </div>
                         </div>

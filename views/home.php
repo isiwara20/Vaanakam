@@ -1119,7 +1119,7 @@ foreach ($categoryIconBarConfig as $cfg) {
                 <div class="mega-deal-img-wrap">
                     <a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($deal['slug']); ?>">
                         <?php if ($deal['image']): ?>
-                        <img src="<?php echo htmlspecialchars(media_image_url($deal['image'])); ?>" alt="<?php echo htmlspecialchars(translate_product_name($deal['name'])); ?>" loading="lazy">
+                        <img src="<?php echo htmlspecialchars(media_image_url($deal['image'])); ?>" alt="<?php echo htmlspecialchars(translate_product_name($deal['name'], $deal['name_ta'] ?? null)); ?>" loading="lazy">
                         <?php else: ?>
                         <img src="<?php echo asset_image_url('assets/images/logo.png'); ?>" alt="" style="opacity:0.3;">
                         <?php endif; ?>
@@ -1127,9 +1127,9 @@ foreach ($categoryIconBarConfig as $cfg) {
                     <span class="deal-discount"><?php echo round((($deal['original_price'] - $deal['deal_price']) / $deal['original_price']) * 100); ?>% OFF</span>
                 </div>
                 <div class="mega-deal-body">
-                    <span class="mega-deal-category"><?php echo htmlspecialchars(translate_text($deal['category_name'] ?? '')); ?></span>
+                    <span class="mega-deal-category"><?php echo htmlspecialchars(translate_text($deal['category_name'] ?? '', $deal['category_name_ta'] ?? null)); ?></span>
                     <a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($deal['slug']); ?>" class="mega-deal-title">
-                        <?php echo htmlspecialchars(translate_product_name($deal['name'])); ?>
+                        <?php echo htmlspecialchars(translate_product_name($deal['name'], $deal['name_ta'] ?? null)); ?>
                     </a>
                     <div class="mega-deal-pricing">
                         <span class="deal-price"><?php echo format_price($deal['deal_price']); ?></span>
@@ -1173,7 +1173,7 @@ foreach ($categoryIconBarConfig as $cfg) {
                     <?php endif; ?>
                     <div class="category-card-bottom">
                         <div class="category-card-info">
-                            <span class="category-card-name"><?php echo htmlspecialchars(translate_text($cat['name'])); ?></span>
+                            <span class="category-card-name"><?php echo htmlspecialchars(translate_text($cat['name'], $cat['name_ta'] ?? null)); ?></span>
                             <span class="category-card-link"><?php echo __t('shop_now'); ?> <i class="fas fa-arrow-right"></i></span>
                         </div>
                     </div>

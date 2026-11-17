@@ -1038,10 +1038,10 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
         <a href="<?php echo BASE_URL; ?>shop.php"><?php echo __t('shop'); ?></a>
         <span class="separator"><i class="fas fa-chevron-right"></i></span>
         <?php if ($product['category_name']): ?>
-        <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars(translate_text($product['category_name'])); ?></a>
+        <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($product['category_slug']); ?>"><?php echo htmlspecialchars(translate_text($product['category_name'], $product['category_name_ta'] ?? null)); ?></a>
         <span class="separator"><i class="fas fa-chevron-right"></i></span>
         <?php endif; ?>
-        <span><?php echo htmlspecialchars(translate_product_name($product['name'])); ?></span>
+        <span><?php echo htmlspecialchars(translate_product_name($product['name'], $product['name_ta'] ?? null)); ?></span>
     </div>
 </div>
 
@@ -1051,9 +1051,9 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
         <!-- Product name shown above image on mobile/tablet -->
         <div class="product-heading-top">
             <?php if ($product['category_name']): ?>
-            <span class="product-category-badge"><?php echo htmlspecialchars(translate_text($product['category_name'])); ?></span>
+            <span class="product-category-badge"><?php echo htmlspecialchars(translate_text($product['category_name'], $product['category_name_ta'] ?? null)); ?></span>
             <?php endif; ?>
-            <h1 class="product-title"><?php echo htmlspecialchars(translate_product_name($product['name'])); ?></h1>
+            <h1 class="product-title"><?php echo htmlspecialchars(translate_product_name($product['name'], $product['name_ta'] ?? null)); ?></h1>
             <p class="product-author"><?php echo SITE_NAME; ?> - <span><?php echo htmlspecialchars($product['author']); ?></span></p>
         </div>
 
@@ -1063,7 +1063,7 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
             <div class="product-image-section">
                 <div class="product-image-wrap">
                     <?php if ($product['image']): ?>
-                    <img src="<?php echo htmlspecialchars(media_image_url($product['image'])); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" id="mainProductImg">
+                    <img src="<?php echo htmlspecialchars(media_image_url($product['image'])); ?>" alt="<?php echo htmlspecialchars(translate_product_name($product['name'], $product['name_ta'] ?? null)); ?>" id="mainProductImg">
                     <?php else: ?>
                     <div class="product-image-placeholder">
                         <i class="fas fa-camera"></i>
@@ -1096,10 +1096,10 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
             <div class="product-info">
                 <div class="product-heading-desktop">
                     <?php if ($product['category_name']): ?>
-                    <span class="product-category-badge"><?php echo htmlspecialchars(translate_text($product['category_name'])); ?></span>
+                    <span class="product-category-badge"><?php echo htmlspecialchars(translate_text($product['category_name'], $product['category_name_ta'] ?? null)); ?></span>
                     <?php endif; ?>
                     
-                    <h1 class="product-title"><?php echo htmlspecialchars(translate_product_name($product['name'])); ?></h1>
+                    <h1 class="product-title"><?php echo htmlspecialchars(translate_product_name($product['name'], $product['name_ta'] ?? null)); ?></h1>
                     
                     <p class="product-author"><?php echo SITE_NAME; ?> - <span><?php echo htmlspecialchars($product['author']); ?></span></p>
                 </div>
@@ -1397,7 +1397,7 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
                         <?php foreach (array_slice($categories, 0, 9) as $cat): ?>
                         <li>
                             <a href="<?php echo BASE_URL; ?>shop.php?category=<?php echo htmlspecialchars($cat['slug']); ?>" class="<?php echo ($cat['id'] == $product['category_id']) ? 'active' : ''; ?>">
-                                <span><?php echo htmlspecialchars(translate_text($cat['name'])); ?></span>
+                                <span><?php echo htmlspecialchars(translate_text($cat['name'], $cat['name_ta'] ?? null)); ?></span>
                             </a>
                         </li>
                         <?php endforeach; ?>
@@ -1586,13 +1586,13 @@ $productShareMessage = $product['name'] . ' — ' . $productSharePrice . ' ' . $
                 <a href="<?php echo BASE_URL; ?>product.php?slug=<?php echo htmlspecialchars($related['slug']); ?>" class="related-card">
                     <div class="related-card-img">
                         <?php if ($related['image']): ?>
-                        <img src="<?php echo htmlspecialchars(media_image_url($related['image'])); ?>" alt="<?php echo htmlspecialchars(translate_product_name($related['name'])); ?>">
+                        <img src="<?php echo htmlspecialchars(media_image_url($related['image'])); ?>" alt="<?php echo htmlspecialchars(translate_product_name($related['name'], $related['name_ta'] ?? null)); ?>">
                         <?php else: ?>
                         <div class="placeholder"><i class="fas fa-seedling"></i></div>
                         <?php endif; ?>
                     </div>
                     <div class="related-card-body">
-                        <h4><?php echo htmlspecialchars(translate_product_name($related['name'])); ?></h4>
+                        <h4><?php echo htmlspecialchars(translate_product_name($related['name'], $related['name_ta'] ?? null)); ?></h4>
                         <span class="related-price"><?php echo format_price($related['price']); ?></span>
                     </div>
                 </a>

@@ -3,6 +3,7 @@ require_once __DIR__ . '/../config/app.php';
 $pageTitle = __t('contact_us') . " - " . SITE_NAME;
 require_once __DIR__ . '/../helpers/sms.php';
 require_once __DIR__ . '/partials/header.php';
+$isTamil = (get_current_language() === 'ta');
 
 $contactBannerUrl = null;
 $contactBannerRoot = dirname(__DIR__);
@@ -869,9 +870,9 @@ a.lumak-contact-quick-item {
     </div>
     <div class="container">
         <div class="lumak-contact-hero-inner">
-            <span class="lumak-contact-hero-badge"><i class="fas fa-headset"></i> We're Here to Help</span>
-            <h1>Contact <span><?php echo SITE_NAME; ?></span></h1>
-            <p class="lumak-contact-hero-lead">Questions about an order, a product, or delivery? Our team at <?php echo STORE_OWNER; ?> is ready to help you.</p>
+            <span class="lumak-contact-hero-badge"><i class="fas fa-headset"></i> <?php echo $isTamil ? 'உங்களுக்கு உதவ நாங்கள் தயாராக உள்ளோம்' : "We're Here to Help"; ?></span>
+            <h1><?php echo $isTamil ? 'வானகத்தைத் <span>தொடர்புகொள்ள</span>' : 'Contact <span>' . SITE_NAME . '</span>'; ?></h1>
+            <p class="lumak-contact-hero-lead"><?php echo $isTamil ? 'உங்கள் ஆர்டர், தயாரிப்புகள் அல்லது விநியோகம் குறித்த ஏதேனும் கேள்விகள் உள்ளதா? ' . STORE_OWNER . ' குழுவினர் உங்களுக்கு உதவ எப்போதும் தயாராக உள்ளோம்.' : 'Questions about an order, a product, or delivery? Our team at ' . STORE_OWNER . ' is ready to help you.'; ?></p>
         </div>
     </div>
 </header>
@@ -881,7 +882,7 @@ a.lumak-contact-quick-item {
     <div class="lumak-contact-quick">
         <div class="lumak-contact-quick-item lumak-contact-quick-item--static">
             <i class="fas fa-phone-alt"></i>
-            <strong>Call Us</strong>
+            <strong><?php echo $isTamil ? 'அழைக்க' : 'Call Us'; ?></strong>
             <span class="lumak-contact-quick-phones">
                 <?php echo render_store_phone_numbers([STORE_PHONE_1, STORE_PHONE_2], [
                     'table_class' => 'store-phone-table--sm',
@@ -892,17 +893,17 @@ a.lumak-contact-quick-item {
         <a href="https://wa.me/<?php echo STORE_WHATSAPP; ?>" target="_blank" rel="noopener" class="lumak-contact-quick-item">
             <i class="fab fa-whatsapp"></i>
             <strong>WhatsApp</strong>
-            <span>Chat instantly</span>
+            <span><?php echo $isTamil ? 'உடனடி அரட்டை' : 'Chat instantly'; ?></span>
         </a>
         <a href="mailto:<?php echo STORE_EMAIL; ?>" class="lumak-contact-quick-item">
             <i class="fas fa-envelope"></i>
-            <strong>Email</strong>
+            <strong><?php echo $isTamil ? 'மின்னஞ்சல்' : 'Email'; ?></strong>
             <span><?php echo STORE_EMAIL; ?></span>
         </a>
         <a href="<?php echo BASE_URL; ?>track-order.php" class="lumak-contact-quick-item">
             <i class="fas fa-box"></i>
-            <strong>Track Order</strong>
-            <span>Check delivery status</span>
+            <strong><?php echo $isTamil ? 'ஆர்டரை பின்தொடரவும்' : 'Track Order'; ?></strong>
+            <span><?php echo $isTamil ? 'விநியோக நிலையை அறிய' : 'Check delivery status'; ?></span>
         </a>
     </div>
 </div>
@@ -916,7 +917,7 @@ a.lumak-contact-quick-item {
                 <div class="lumak-contact-info-card">
                     <div class="lumak-contact-info-icon"><i class="fas fa-map-marker-alt"></i></div>
                     <div class="lumak-contact-info-content">
-                        <h3>Our Location</h3>
+                        <h3><?php echo $isTamil ? 'எங்கள் இருப்பிடம்' : 'Our Location'; ?></h3>
                         <p><a href="<?php echo htmlspecialchars(store_map_open_url()); ?>" target="_blank" rel="noopener noreferrer"><?php echo STORE_LOCATION; ?></a><br><a href="https://<?php echo STORE_DOMAIN; ?>" target="_blank" rel="noopener"><?php echo STORE_DOMAIN; ?></a></p>
                     </div>
                 </div>
@@ -924,7 +925,7 @@ a.lumak-contact-quick-item {
                 <div class="lumak-contact-info-card">
                     <div class="lumak-contact-info-icon"><i class="fas fa-phone-alt"></i></div>
                     <div class="lumak-contact-info-content">
-                        <h3>Phone</h3>
+                        <h3><?php echo $isTamil ? 'தொலைபேசி' : 'Phone'; ?></h3>
                         <?php echo render_store_phone_numbers([STORE_PHONE_1, STORE_PHONE_2], ['attrs' => ['data-turbo' => 'false']]); ?>
                     </div>
                 </div>
@@ -932,24 +933,24 @@ a.lumak-contact-quick-item {
                 <div class="lumak-contact-info-card">
                     <div class="lumak-contact-info-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
                     <div class="lumak-contact-info-content">
-                        <h3>WhatsApp Support</h3>
-                        <p>Fast replies for orders, products, and delivery questions.<br><a href="https://wa.me/<?php echo STORE_WHATSAPP; ?>" target="_blank" rel="noopener">Message us on WhatsApp</a></p>
+                        <h3><?php echo $isTamil ? 'வாட்ஸ்அப் ஆதரவு' : 'WhatsApp Support'; ?></h3>
+                        <p><?php echo $isTamil ? 'ஆர்டர்கள், தயாரிப்புகள் மற்றும் விநியோகக் கேள்விகளுக்கு விரைவான பதில்கள்.' : 'Fast replies for orders, products, and delivery questions.'; ?><br><a href="https://wa.me/<?php echo STORE_WHATSAPP; ?>" target="_blank" rel="noopener"><?php echo $isTamil ? 'வாட்ஸ்அப்பில் செய்தி அனுப்புக' : 'Message us on WhatsApp'; ?></a></p>
                     </div>
                 </div>
 
                 <div class="lumak-contact-info-card">
                     <div class="lumak-contact-info-icon"><i class="fas fa-clock"></i></div>
                     <div class="lumak-contact-info-content">
-                        <h3>Working Hours</h3>
-                        <p>Monday – Saturday: 8:00 AM – 6:00 PM<br>Sunday: Closed<br><span style="font-size:12px;color:#22C55E;">24/7 online ordering available</span></p>
+                        <h3><?php echo $isTamil ? 'வேலை நேரம்' : 'Working Hours'; ?></h3>
+                        <p><?php echo $isTamil ? 'திங்கள் – சனி: காலை 8:00 – மாலை 6:00' : 'Monday – Saturday: 8:00 AM – 6:00 PM'; ?><br><?php echo $isTamil ? 'ஞாயிறு: விடுமுறை' : 'Sunday: Closed'; ?><br><span style="font-size:12px;color:#22C55E;"><?php echo $isTamil ? '24/7 இணைய முன்பதிவு வசதி' : '24/7 online ordering available'; ?></span></p>
                     </div>
                 </div>
 
                 <div class="lumak-contact-info-card">
                     <div class="lumak-contact-info-icon"><i class="fas fa-share-alt"></i></div>
                     <div class="lumak-contact-info-content">
-                        <h3>Follow <?php echo SITE_NAME; ?></h3>
-                        <p>Stay updated on new arrivals, offers &amp; collections.</p>
+                        <h3><?php echo $isTamil ? 'எங்களை பின்தொடருங்கள்' : 'Follow ' . SITE_NAME; ?></h3>
+                        <p><?php echo $isTamil ? 'புதிய வரவுகள் மற்றும் சலுகைகள் பற்றிய தகவல்களைப் பெறுங்கள்.' : 'Stay updated on new arrivals, offers &amp; collections.'; ?></p>
                         <div class="lumak-contact-social">
                             <a href="<?php echo htmlspecialchars(STORE_FACEBOOK_URL); ?>" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                             <a href="<?php echo htmlspecialchars(STORE_INSTAGRAM_URL); ?>" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
@@ -963,52 +964,52 @@ a.lumak-contact-quick-item {
             <!-- Right: Contact form -->
             <div class="lumak-contact-form-card">
                 <div class="lumak-contact-form-header">
-                    <h2><i class="fas fa-paper-plane"></i> Send Us a Message</h2>
-                    <p>Fill in the form below and we'll get back to you as soon as possible.</p>
+                    <h2><i class="fas fa-paper-plane"></i> <?php echo $isTamil ? 'எங்களுக்கு ஒரு செய்தி அனுப்புக' : 'Send Us a Message'; ?></h2>
+                    <p><?php echo $isTamil ? 'கீழே உள்ள படிவத்தைப் பூர்த்தி செய்யுங்கள், விரைவில் உங்களைத் தொடர்பு கொள்கிறோம்.' : "Fill in the form below and we'll get back to you as soon as possible."; ?></p>
                 </div>
                 <div class="lumak-contact-form-body">
                     <form class="lumak-contact-form" id="lumakContactForm" novalidate data-ajax>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="contactName">Full Name <span style="color:#ef4444;">*</span></label>
-                                <input type="text" id="contactName" name="name" placeholder="Your full name" required>
+                                <label for="contactName"><?php echo __t('full_name'); ?> <span style="color:#ef4444;">*</span></label>
+                                <input type="text" id="contactName" name="name" placeholder="<?php echo htmlspecialchars(__t('enter_name_placeholder')); ?>" required>
                                 <i class="fas fa-user input-icon"></i>
                             </div>
                             <div class="form-group">
-                                <label for="contactPhone">Phone Number</label>
-                                <input type="tel" id="contactPhone" name="phone" placeholder="07X XXX XXXX">
+                                <label for="contactPhone"><?php echo __t('phone_number'); ?></label>
+                                <input type="tel" id="contactPhone" name="phone" placeholder="<?php echo htmlspecialchars(__t('enter_phone_placeholder')); ?>">
                                 <i class="fas fa-phone-alt input-icon"></i>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="contactEmail">Email Address</label>
-                            <input type="email" id="contactEmail" name="email" placeholder="your@email.com">
+                            <label for="contactEmail"><?php echo __t('email_address'); ?></label>
+                            <input type="email" id="contactEmail" name="email" placeholder="<?php echo htmlspecialchars(__t('enter_email_placeholder')); ?>">
                             <i class="fas fa-envelope input-icon"></i>
                         </div>
-                        <p style="margin:-6px 0 14px;font-size:11px;color:#888;line-height:1.5;">Provide your email and/or phone so we can send your enquiry reference number.</p>
+                        <p style="margin:-6px 0 14px;font-size:11px;color:#888;line-height:1.5;"><?php echo $isTamil ? 'உங்கள் விசாரணை எண்ணைப் பெற மின்னஞ்சல் அல்லது தொலைபேசி எண்ணை உள்ளிடவும்.' : 'Provide your email and/or phone so we can send your enquiry reference number.'; ?></p>
                         <div class="form-group">
-                            <label for="contactTopic">Topic</label>
+                            <label for="contactTopic"><?php echo $isTamil ? 'பொருள் / தலைப்பு' : 'Topic'; ?></label>
                             <select id="contactTopic" name="topic">
-                                <option value="General Enquiry">General Enquiry</option>
-                                <option value="Order Question">Order Question</option>
-                                <option value="Shipping & Delivery">Shipping &amp; Delivery</option>
-                                <option value="Returns & Refunds">Returns &amp; Refunds</option>
-                                <option value="Product Question">Product Question</option>
-                                <option value="Wholesale / Bulk Order">Wholesale / Bulk Order</option>
+                                <option value="General Enquiry"><?php echo $isTamil ? 'பொதுவான விசாரணை' : 'General Enquiry'; ?></option>
+                                <option value="Order Question"><?php echo $isTamil ? 'ஆர்டர் பற்றிய கேள்வி' : 'Order Question'; ?></option>
+                                <option value="Shipping & Delivery"><?php echo $isTamil ? 'விநியோகம் பற்றிய கேள்வி' : 'Shipping &amp; Delivery'; ?></option>
+                                <option value="Returns & Refunds"><?php echo $isTamil ? 'திருப்பியளிப்பு & பணம் திரும்பப் பெறல்' : 'Returns &amp; Refunds'; ?></option>
+                                <option value="Product Question"><?php echo $isTamil ? 'தயாரிப்பு பற்றிய கேள்வி' : 'Product Question'; ?></option>
+                                <option value="Wholesale / Bulk Order"><?php echo $isTamil ? 'மொத்த வியாபாரம் / பெரிய ஆர்டர்' : 'Wholesale / Bulk Order'; ?></option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="contactSubject">Subject</label>
-                            <input type="text" id="contactSubject" name="subject" placeholder="Brief summary of your message" required>
+                            <label for="contactSubject"><?php echo __t('subject'); ?></label>
+                            <input type="text" id="contactSubject" name="subject" placeholder="<?php echo $isTamil ? 'செய்தியின் தலைப்பு அல்லது சுருக்கம்' : 'Brief summary of your message'; ?>" required>
                             <i class="fas fa-tag input-icon"></i>
                         </div>
                         <div class="form-group">
-                            <label for="contactMessage">Message</label>
-                            <textarea id="contactMessage" name="message" placeholder="Tell us how we can help you... (at least 10 characters)" required></textarea>
+                            <label for="contactMessage"><?php echo __t('message'); ?></label>
+                            <textarea id="contactMessage" name="message" placeholder="<?php echo $isTamil ? 'உங்களுக்கு நாங்கள் எவ்வாறு உதவலாம் என்பதை விவரிக்கவும்...' : 'Tell us how we can help you... (at least 10 characters)'; ?>" required></textarea>
                         </div>
                         <div class="lumak-contact-form-actions">
                             <button type="submit" class="lumak-contact-btn submit" id="contactSubmitBtn">
-                                <i class="fas fa-paper-plane"></i> Send Message
+                                <i class="fas fa-paper-plane"></i> <?php echo __t('send_message'); ?>
                             </button>
                         </div>
                         <div class="lumak-contact-alert-slot" aria-live="polite">
@@ -1041,24 +1042,24 @@ a.lumak-contact-quick-item {
 
         <!-- Help links -->
         <div class="lumak-contact-section-head">
-            <h2>Quick Help</h2>
-            <p>Find answers faster — browse our help pages before reaching out.</p>
+            <h2><?php echo $isTamil ? 'விரைவு உதவி' : 'Quick Help'; ?></h2>
+            <p><?php echo $isTamil ? 'விடைகளை விரைவாக அறிய — எங்கள் உதவிப் பக்கங்களைப் பார்வையிடுங்கள்.' : 'Find answers faster — browse our help pages before reaching out.'; ?></p>
         </div>
         <div class="lumak-contact-help-grid">
             <a href="<?php echo BASE_URL; ?>faq.php" class="lumak-contact-help-card">
                 <i class="fas fa-question-circle"></i>
-                <strong>FAQ</strong>
-                <span>Common questions about products, shipping &amp; payments</span>
+                <strong><?php echo __t('faq'); ?></strong>
+                <span><?php echo $isTamil ? 'தயாரிப்புகள், விநியோகம் &amp; கட்டணம் பற்றிய பொதுவான கேள்விகள்' : 'Common questions about products, shipping &amp; payments'; ?></span>
             </a>
             <a href="<?php echo BASE_URL; ?>shipping-policy.php" class="lumak-contact-help-card">
                 <i class="fas fa-truck"></i>
-                <strong>Shipping Policy</strong>
-                <span>Delivery times, tracking &amp; island-wide shipping info</span>
+                <strong><?php echo __t('shipping_policy'); ?></strong>
+                <span><?php echo $isTamil ? 'விநியோக நேரம், கண்காணிப்பு &amp; விநியோக விபரங்கள்' : 'Delivery times, tracking &amp; island-wide shipping info'; ?></span>
             </a>
             <a href="<?php echo BASE_URL; ?>refund-policy.php" class="lumak-contact-help-card">
                 <i class="fas fa-undo-alt"></i>
-                <strong>Refund Policy</strong>
-                <span>Returns, exchanges &amp; refund process</span>
+                <strong><?php echo __t('refund_policy'); ?></strong>
+                <span><?php echo $isTamil ? 'பொருட்கள் திருப்பியளிப்பு &amp; பணம் திரும்பப் பெறுதல்' : 'Returns, exchanges &amp; refund process'; ?></span>
             </a>
         </div>
 

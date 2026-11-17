@@ -311,20 +311,21 @@ if (!function_exists('get_master_tamil_entities')) {
 }
 
 /**
- * Universal dynamic translator for database entities & text (Product names, Categories, Banners)
+ * Smart automatic English to Tamil translation engine
+ * - Exact dictionary matching
+ * - Multi-word phrase & compound matching
+ * - Units & packaging conversion (e.g. 500ml, 1kg, 250g)
+ * - Extensive grocery, natural products, spices, herbs vocabulary
  */
-if (!function_exists('translate_text')) {
-    function translate_text(?string $text): string
+if (!function_exists('auto_translate_to_tamil')) {
+    function auto_translate_to_tamil(?string $text): string
     {
-        if ($text === null || $text === '') {
+        if ($text === null || trim($text) === '') {
             return '';
         }
-        if (get_current_language() !== 'ta') {
-            return $text;
-        }
 
-        $dict = get_master_tamil_entities();
         $trimmed = trim($text);
+        $dict = get_master_tamil_entities();
 
         // 1. Direct exact match
         if (isset($dict[$trimmed])) {
@@ -339,48 +340,13 @@ if (!function_exists('translate_text')) {
             }
         }
 
-        // 3. Fallback to __t() dictionary key
+        // 3. Fallback to translation dictionary key
         $tVal = __t($trimmed);
         if ($tVal !== $trimmed) {
             return $tVal;
         }
 
-        return $text;
-    }
-}
-
-/**
- * Translate Product Names with smart compound and phrase matching
- */
-if (!function_exists('translate_product_name')) {
-    function translate_product_name(?string $name): string
-    {
-        if ($name === null || $name === '') {
-            return '';
-        }
-        if (get_current_language() !== 'ta') {
-            return $name;
-        }
-
-        $trimmed = trim($name);
-        $dict = get_master_tamil_entities();
-
-        // 1. Exact match
-        if (isset($dict[$trimmed])) {
-            return $dict[$trimmed];
-        }
-
-        // 2. Case-insensitive exact match
-        $lower = mb_strtolower($trimmed, 'UTF-8');
-        foreach ($dict as $en => $ta) {
-            if (mb_strtolower($en, 'UTF-8') === $lower) {
-                return $ta;
-            }
-        }
-
-        // 3. Compound / Phrase matching:
-        // Replace longest English phrases first with their Tamil equivalents
-        $translated = $trimmed;
+        // 4. Phrase & Compound matching (longest phrases first)
         static $sortedKeys = null;
         if ($sortedKeys === null) {
             $sortedKeys = array_keys($dict);
@@ -389,48 +355,214 @@ if (!function_exists('translate_product_name')) {
             });
         }
 
+        $translated = $trimmed;
         foreach ($sortedKeys as $enKey) {
             if (mb_strlen($enKey, 'UTF-8') < 3) {
                 continue;
             }
-            if (stripos($translated, $enKey) !== false) {
-                $taVal = $dict[$enKey];
-                $pattern = '/\b' . preg_quote($enKey, '/') . '\b/iu';
-                if (preg_match($pattern, $translated)) {
-                    $translated = preg_replace($pattern, $taVal, $translated);
-                }
+            $pattern = '/\b' . preg_quote($enKey, '/') . '\b/iu';
+            if (preg_match($pattern, $translated)) {
+                $translated = preg_replace($pattern, $dict[$enKey], $translated);
             }
         }
 
-        // Translate common units/words in product titles
+        // 5. Units & quantities map
         $unitMap = [
-            '/\b10kg\b/i'    => '10 கிலோ',
-            '/\b5kg\b/i'     => '5 கிலோ',
-            '/\b2kg\b/i'     => '2 கிலோ',
-            '/\b1kg\b/i'     => '1 கிலோ',
-            '/\b500g\b/i'    => '500 கிராம்',
-            '/\b250g\b/i'    => '250 கிராம்',
-            '/\b100g\b/i'    => '100 கிராம்',
-            '/\b50g\b/i'     => '50 கிராம்',
-            '/\b5l\b/i'      => '5 லீட்டர்',
-            '/\b2l\b/i'      => '2 லீட்டர்',
-            '/\b1l\b/i'      => '1 லீட்டர்',
-            '/\b500ml\b/i'   => '500 மி.லீ',
-            '/\b250ml\b/i'   => '250 மி.லீ',
-            '/\b100ml\b/i'   => '100 மி.லீ',
-            '/\bOrganic\b/i' => 'இயற்கை',
-            '/\bPure\b/i'    => 'தூய',
-            '/\bFresh\b/i'   => 'புதிய',
-            '/\bNatural\b/i' => 'இயற்கை',
-            '/\bTraditional\b/i' => 'பாரம்பரிய',
-            '/\bRoasted\b/i' => 'வறுத்த',
-            '/\bRaw\b/i'     => 'பச்சை',
+            '/\b10\s*kg\b/i'        => '10 கிலோ',
+            '/\b5\s*kg\b/i'         => '5 கிலோ',
+            '/\b2\s*kg\b/i'         => '2 கிலோ',
+            '/\b1\s*kg\b/i'         => '1 கிலோ',
+            '/\b750\s*g\b/i'        => '750 கிராம்',
+            '/\b500\s*g\b/i'        => '500 கிராம்',
+            '/\b375\s*g\b/i'        => '375 கிராம்',
+            '/\b250\s*g\b/i'        => '250 கிராம்',
+            '/\b200\s*g\b/i'        => '200 கிராம்',
+            '/\b150\s*g\b/i'        => '150 கிராம்',
+            '/\b100\s*g\b/i'        => '100 கிராம்',
+            '/\b50\s*g\b/i'         => '50 கிராம்',
+            '/\b25\s*g\b/i'         => '25 கிராம்',
+            '/\b5\s*l(?:iter|itre)?s?\b/i'  => '5 லீட்டர்',
+            '/\b2\s*l(?:iter|itre)?s?\b/i'  => '2 லீட்டர்',
+            '/\b1\s*l(?:iter|itre)?s?\b/i'  => '1 லீட்டர்',
+            '/\b750\s*ml\b/i'       => '750 மி.லீ',
+            '/\b500\s*ml\b/i'       => '500 மி.லீ',
+            '/\b375\s*ml\b/i'       => '375 மி.லீ',
+            '/\b250\s*ml\b/i'       => '250 மி.லீ',
+            '/\b200\s*ml\b/i'       => '200 மி.லீ',
+            '/\b100\s*ml\b/i'       => '100 மி.லீ',
+            '/\b50\s*ml\b/i'        => '50 மி.லீ',
+            '/\b(\d+)\s*pcs?\b/i'   => '$1 எண்ணிக்கை',
+            '/\b(\d+)\s*packs?\b/i' => '$1 பாக்கெட்',
         ];
         foreach ($unitMap as $regex => $taUnit) {
             $translated = preg_replace($regex, $taUnit, $translated);
         }
 
-        return $translated;
+        // 6. Comprehensive Grocery, Spices & Natural Products Word Map
+        $wordsMap = [
+            'organic'       => 'இயற்கை',
+            'pure'          => 'தூய',
+            'natural'       => 'இயற்கை',
+            'fresh'         => 'புதிய',
+            'traditional'   => 'பாரம்பரிய',
+            'roasted'       => 'வறுத்த',
+            'raw'           => 'பச்சை',
+            'dried'         => 'உலர்',
+            'dry'           => 'உலர்',
+            'spicy'         => 'காரசாரமான',
+            'salted'        => 'உப்பு சேர்க்கப்பட்ட',
+            'sweet'         => 'இனிப்பு',
+            'crushed'       => 'நசுக்கிய',
+            'ground'        => 'அரைத்த',
+            'whole'         => 'முழு',
+            'sticks'        => 'சுருள் பட்டை',
+            'stick'         => 'சுருள் பட்டை',
+            'powder'        => 'தூள்',
+            'flour'         => 'மாவு',
+            'flours'        => 'மாவு வகைகள்',
+            'seeds'         => 'விதைகள்',
+            'seed'          => 'விதை',
+            'leaf'          => 'இலை',
+            'leaves'        => 'இலைகள்',
+            'oil'           => 'எண்ணெய்',
+            'oils'          => 'எண்ணெய்கள்',
+            'cold-pressed'  => 'மரச்செக்கு',
+            'cold pressed'  => 'மரச்செக்கு',
+            'ghee'          => 'நெய்',
+            'honey'         => 'தேன்',
+            'jaggery'       => 'வெல்லம்',
+            'sugar'         => 'சர்க்கரை',
+            'salt'          => 'உப்பு',
+            'tea'           => 'தேநீர்',
+            'coffee'        => 'காபி',
+            'soap'          => 'சோப்பு',
+            'shampoo'       => 'ஷாம்பு',
+            'rice'          => 'அரிசி',
+            'grains'        => 'தானியங்கள்',
+            'grain'         => 'தானியம்',
+            'millet'        => 'சிறுதானியம்',
+            'millets'       => 'சிறுதானியங்கள்',
+            'ragi'          => 'கேழ்வரகு (ராகி)',
+            'dhal'          => 'பருப்பு',
+            'dal'           => 'பருப்பு',
+            'gram'          => 'பயறு',
+            'cashews'       => 'முந்திரி',
+            'cashew'        => 'முந்திரி',
+            'nuts'          => 'நட்ஸ்',
+            'nut'           => 'பருப்பு',
+            'almonds'       => 'பாதாம்',
+            'almond'        => 'பாதாம்',
+            'walnuts'       => 'அக்ரூட்',
+            'dates'         => 'பேரீச்சம்பழம்',
+            'raisins'       => 'உலர் திராட்சை',
+            'spices'        => 'மசாலாக்கள்',
+            'spice'         => 'மசாலா',
+            'curry'         => 'கறி மசாலா',
+            'pepper'        => 'மிளகு',
+            'chili'         => 'மிளகாய்',
+            'chilli'        => 'மிளகாய்',
+            'turmeric'      => 'மஞ்சள்',
+            'coriander'     => 'கொத்தமல்லி',
+            'cumin'         => 'சீரகம்',
+            'fennel'        => 'சோம்பு',
+            'fenugreek'     => 'வெந்தயம்',
+            'mustard'       => 'கடுகு',
+            'cardamom'      => 'ஏலக்காய்',
+            'cinnamon'      => 'பட்டை',
+            'clove'         => 'கிராம்பு',
+            'cloves'        => 'கிராம்பு',
+            'moringa'       => 'முருங்கை',
+            'neem'          => 'வேம்பு',
+            'tulsi'         => 'துளசி',
+            'aloe vera'     => 'கற்றாழை',
+            'aloevera'      => 'கற்றாழை',
+            'ginger'        => 'இஞ்சி',
+            'garlic'        => 'பூண்டு',
+            'sesame'        => 'எள்ளு / நல்லெண்ணெய்',
+            'coconut'       => 'தேங்காய்',
+            'groundnut'     => 'கடலை',
+            'peanut'        => 'கடலை',
+            'kithul'        => 'கித்துள்',
+            'wild'          => 'காட்டு',
+            'herbal'        => 'மூலிகை',
+            'ayurvedic'     => 'ஆயுர்வேத',
+            'items'         => 'பொருட்கள்',
+            'products'      => 'பொருட்கள்',
+            'essentials'    => 'அத்தியாவசியங்கள்',
+            'ceylon'        => 'இலங்கை',
+            'sri lanka'     => 'இலங்கை',
+            'black'         => 'கருப்பு',
+            'white'         => 'வெள்ளை',
+            'red'           => 'சிவப்பு',
+            'green'         => 'பச்சை',
+            'yellow'        => 'மஞ்சள்',
+            'beverages'     => 'பானங்கள்',
+            'snacks'        => 'சிற்றுண்டிகள்',
+            'sweeteners'    => 'இனிப்புகள்',
+            'powders'       => 'நறுமணத் தூள்கள்',
+            'health'        => 'ஆரோக்கியம்',
+            'groceries'     => 'மளிகைப் பொருட்கள்',
+            'grocery'       => 'மளிகை',
+            'handmade'      => 'கைவினைத் தயாரிப்பு',
+            'premium'       => 'உயர்தர',
+        ];
+
+        static $sortedWords = null;
+        if ($sortedWords === null) {
+            $sortedWords = array_keys($wordsMap);
+            usort($sortedWords, function ($a, $b) {
+                return mb_strlen($b, 'UTF-8') - mb_strlen($a, 'UTF-8');
+            });
+        }
+
+        foreach ($sortedWords as $w) {
+            $pattern = '/\b' . preg_quote($w, '/') . '\b/iu';
+            if (preg_match($pattern, $translated)) {
+                $translated = preg_replace($pattern, $wordsMap[$w], $translated);
+            }
+        }
+
+        return preg_replace('/\s+/', ' ', trim($translated));
+    }
+}
+
+/**
+ * Universal dynamic translator for database entities & text (Categories, Subcategories, Banners)
+ */
+if (!function_exists('translate_text')) {
+    function translate_text(?string $text, ?string $textTa = null): string
+    {
+        if ($text === null || $text === '') {
+            return '';
+        }
+        if (get_current_language() !== 'ta') {
+            return $text;
+        }
+        if ($textTa !== null && trim($textTa) !== '') {
+            return trim($textTa);
+        }
+
+        return auto_translate_to_tamil($text);
+    }
+}
+
+/**
+ * Translate Product Names with smart compound and phrase matching
+ */
+if (!function_exists('translate_product_name')) {
+    function translate_product_name(?string $name, ?string $nameTa = null): string
+    {
+        if ($name === null || $name === '') {
+            return '';
+        }
+        if (get_current_language() !== 'ta') {
+            return $name;
+        }
+        if ($nameTa !== null && trim($nameTa) !== '') {
+            return trim($nameTa);
+        }
+
+        return auto_translate_to_tamil($name);
     }
 }
 
@@ -438,8 +570,8 @@ if (!function_exists('translate_product_name')) {
  * Shorthand alias
  */
 if (!function_exists('__tp')) {
-    function __tp(?string $name): string
+    function __tp(?string $name, ?string $nameTa = null): string
     {
-        return translate_product_name($name);
+        return translate_product_name($name, $nameTa);
     }
 }

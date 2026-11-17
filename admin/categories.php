@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../helpers/db_schema.php';
+require_once __DIR__ . '/../helpers/language.php';
 
 // Check if user is admin
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -33,6 +34,9 @@ db_repair_auto_increment_table($conn, 'categories');
 // Add sort_order column if not exists
 try {
     $conn->exec("ALTER TABLE categories ADD COLUMN sort_order INT DEFAULT 0 AFTER image");
+} catch (Exception $e) {}
+try {
+    $conn->exec("ALTER TABLE categories ADD COLUMN name_ta VARCHAR(150) NULL AFTER name");
 } catch (Exception $e) {}
 
 // Handle sort order update via AJAX
@@ -74,6 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($action === 'create' || $action === 'update') {
         $name = trim($_POST['name'] ?? '');
+        $nameTa = trim($_POST['name_ta'] ?? '');
+        if ($name !== '' && $nameTa === '') {
+            $nameTa = auto_translate_to_tamil($name);
+        }
         $description = trim($_POST['description'] ?? '');
         $status = $_POST['status'] ?? 'active';
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
@@ -111,8 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (empty($message)) {
             if ($action === 'create') {
                 try {
-                    $stmt = $conn->prepare("INSERT INTO categories (name, slug, description, image, status) VALUES (:name, :slug, :description, :image, :status)");
+                    $stmt = $conn->prepare("INSERT INTO categories (name, name_ta, slug, description, image, status) VALUES (:name, :name_ta, :slug, :description, :image, :status)");
                     $stmt->bindParam(':name', $name);
+                    $stmt->bindParam(':name_ta', $nameTa);
                     $stmt->bindParam(':slug', $slug);
                     $stmt->bindParam(':description', $description);
                     $stmt->bindParam(':image', $imagePath);
@@ -140,8 +149,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // If no new image uploaded, keep old one
                 if (empty($imagePath)) {
-                    $stmt = $conn->prepare("UPDATE categories SET name = :name, slug = :slug, description = :description, status = :status WHERE id = :id");
+                    $stmt = $conn->prepare("UPDATE categories SET name = :name, name_ta = :name_ta, slug = :slug, description = :description, status = :status WHERE id = :id");
                     $stmt->bindParam(':name', $name);
+                    $stmt->bindParam(':name_ta', $nameTa);
                     $stmt->bindParam(':slug', $slug);
                     $stmt->bindParam(':description', $description);
                     $stmt->bindParam(':status', $status);
@@ -156,8 +166,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (file_exists($oldFile)) unlink($oldFile);
                     }
                     
-                    $stmt = $conn->prepare("UPDATE categories SET name = :name, slug = :slug, description = :description, image = :image, status = :status WHERE id = :id");
+                    $stmt = $conn->prepare("UPDATE categories SET name = :name, name_ta = :name_ta, slug = :slug, description = :description, image = :image, status = :status WHERE id = :id");
                     $stmt->bindParam(':name', $name);
+                    $stmt->bindParam(':name_ta', $nameTa);
                     $stmt->bindParam(':slug', $slug);
                     $stmt->bindParam(':description', $description);
                     $stmt->bindParam(':image', $imagePath);
@@ -317,10 +328,21 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                         <?php endif; ?>
                         
                         <div class="form-group">
-                            <label for="name">Category Name <span class="required">*</span></label>
+                            <label for="name">Category Name (English) <span class="required">*</span></label>
                             <input type="text" id="name" name="name" class="form-control" 
                                    value="<?php echo htmlspecialchars($editCategory['name'] ?? ''); ?>" 
-                                   required oninput="generateSlug(this.value)">
+                                   required oninput="generateSlug(this.value); autoTranslateTamil(this.value, 'cat_name_ta');">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cat_name_ta">Category Name in Tamil <span style="font-weight:600;color:#16a34a;font-size:12px;">(தானியங்கி / Auto-Generated தமிழ்)</span></label>
+                            <input type="text" id="cat_name_ta" name="name_ta" class="form-control" 
+                                   value="<?php echo htmlspecialchars($editCategory['name_ta'] ?? ''); ?>" 
+                                   placeholder="தானாக மொழிபெயர்க்கப்படும் / Auto-translated in Tamil..."
+                                   oninput="this.dataset.userEdited = 'true';">
+                            <small style="color:#64748b;font-size:11px;display:block;margin-top:4px;">
+                                <i class="fas fa-language" style="color:#16a34a;"></i> Auto-translates as you type above. You can customize anytime.
+                            </small>
                         </div>
 
                         <div class="form-group">
@@ -533,6 +555,27 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     document.getElementById('deleteCatOverlay').addEventListener('click', function(e) {
         if (e.target === this) hideDeleteConfirm();
     });
+
+    var _translateTimer = null;
+    function autoTranslateTamil(val, targetId) {
+        clearTimeout(_translateTimer);
+        var el = document.getElementById(targetId);
+        if (!val || !val.trim()) {
+            if (el && (!el.dataset.userEdited || el.dataset.userEdited !== 'true')) el.value = '';
+            return;
+        }
+        if (el && el.dataset.userEdited === 'true' && el.value.trim() !== '') return;
+        _translateTimer = setTimeout(function() {
+            fetch('<?php echo BASE_URL; ?>translate-api.php?text=' + encodeURIComponent(val))
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.success && el && (!el.dataset.userEdited || el.dataset.userEdited !== 'true')) {
+                        el.value = data.tamil;
+                    }
+                })
+                .catch(function(e) {});
+        }, 220);
+    }
     </script>
 
     <!-- Delete Confirmation Overlay -->
