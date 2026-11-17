@@ -124,12 +124,18 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: nowrap !important;
+    width: 100%;
+    gap: 20px;
 }
 
 .top-bar-left {
     display: flex;
     gap: 0;
     align-items: center;
+    flex-wrap: nowrap !important;
+    min-width: 0;
+    flex-shrink: 1;
 }
 
 .top-bar-left span,
@@ -138,6 +144,8 @@ ul {
 .top-bar-right .currency-selector,
 .top-bar-right .top-link,
 .top-bar-right .top-link span,
+.top-bar-phone-link,
+.top-bar-track-link,
 #currentLanguage,
 #currentCurrency {
     display: flex;
@@ -145,6 +153,21 @@ ul {
     gap: 6px;
     color: #ffffff !important;
     font-weight: 500;
+    white-space: nowrap !important;
+    flex-shrink: 0;
+}
+
+.top-bar-phone-link span {
+    font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+@media (max-width: 1240px) {
+    .top-bar-hide-narrow {
+        display: none !important;
+    }
 }
 
 .top-bar-left span i,
@@ -6120,6 +6143,23 @@ html[lang="ta"] h6 {
 }
 
 /* Top bar font & alignment */
+html[lang="ta"] .top-bar,
+html[lang="ta"] .top-bar-content,
+html[lang="ta"] .top-bar-left,
+html[lang="ta"] .top-bar-right,
+html[lang="ta"] .top-bar-left span,
+html[lang="ta"] .top-bar-right a,
+html[lang="ta"] .top-bar-right span,
+html[lang="ta"] .top-link,
+html[lang="ta"] .top-link span {
+    white-space: nowrap !important;
+}
+
+html[lang="ta"] .top-bar-secure,
+html[lang="ta"] .top-bar-secure-divider {
+    display: none !important;
+}
+
 html[lang="ta"] .top-bar-badge {
     font-size: 11px;
     line-height: 1.4;

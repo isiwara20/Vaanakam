@@ -118,7 +118,7 @@ function absolute_url(string $path = ''): string
 
 // Store contact details
 define('STORE_PHONE_1', '+94 77 030 5367');
-define('STORE_PHONE_2', '077 030 5367');
+define('STORE_PHONE_2', '+94 77 610 0367');
 define('STORE_EMAIL', 'info@vaanakam.lk');
 define('STORE_DOMAIN', 'vaanakam.lk');
 define('STORE_LOCATION', 'Kanukkerny West, Mulliyawalai, Mullaitivu, Sri Lanka');

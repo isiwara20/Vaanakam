@@ -146,6 +146,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] && (!isset($_SESSION
         .fas,.far,.fab{display:inline-block;min-width:1em;text-align:center;font-style:normal}
         .mobile-lang-btn{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;background:#f0f4f8;color:#0F2B48;text-decoration:none;border:1px solid #e2e8f0;transition:all .2s}
         .mobile-lang-btn.active{background:#16A34A;color:#fff;border-color:#16A34A}
+        .top-bar-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap!important;width:100%;gap:16px}
+        .top-bar-left{display:flex;align-items:center;flex-wrap:nowrap!important;min-width:0;flex-shrink:1}
+        .top-bar-left span,.top-bar-right a,.top-bar-right .top-link,.top-bar-right span{white-space:nowrap!important}
+        .top-bar-phone-link{white-space:nowrap;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+        .top-bar-phone-link span{font-family:'Roboto Mono',monospace;letter-spacing:0.5px}
+        html[lang="ta"] .top-bar-secure,html[lang="ta"] .top-bar-secure-divider{display:none!important}
         @media (max-width:1100px){.header-hotline{display:none!important}}
         @media (max-width:992px){.nav-action-text{display:none}.nav-action-item{padding:8px}.search-desktop{max-width:320px}}
         @media (max-width:768px){
@@ -207,15 +213,17 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] && (!isset($_SESSION
                 <span class="top-bar-hide-mobile"><i class="fas fa-leaf"></i> <?php echo __t('tagline'); ?></span>
                 <span class="top-bar-divider"></span>
                 <span><i class="fas fa-truck"></i> <?php echo __t('island_wide_delivery'); ?></span>
-                <span class="top-bar-divider"></span>
-                <span><i class="fas fa-shield-alt"></i> <?php echo __t('secure_checkout'); ?></span>
+                <?php if (get_current_language() !== 'ta'): ?>
+                <span class="top-bar-divider top-bar-secure-divider"></span>
+                <span class="top-bar-secure"><i class="fas fa-shield-alt"></i> <?php echo __t('secure_checkout'); ?></span>
+                <?php endif; ?>
             </div>
             <div class="top-bar-right">
                 <div class="top-bar-quick-links">
                     <a href="<?php echo BASE_URL; ?>track-order.php" class="top-link top-bar-track-link"><i class="fas fa-truck"></i> <span><?php echo __t('track_order'); ?></span></a>
                 </div>
                 <span class="top-bar-divider top-bar-hide-mobile"></span>
-                <a href="<?php echo BASE_URL; ?>contact.php" class="top-link top-bar-hide-mobile"><?php echo __t('help_center'); ?></a>
+                <a href="tel:0770305367" class="top-link top-bar-phone-link top-bar-hide-mobile" data-turbo="false" title="<?php echo __t('call_us'); ?>"><i class="fas fa-phone-alt"></i> <span>077 030 5367</span></a>
                 <span class="top-bar-divider top-bar-hide-mobile"></span>
                 <div class="top-bar-utils">
                     <!-- Language Selector -->
