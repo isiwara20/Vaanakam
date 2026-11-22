@@ -21,8 +21,12 @@ $m = ezymart_product_card_metrics($prod, $cardContext);
 $productUrl = BASE_URL . 'product.php?slug=' . rawurlencode($prod['slug'] ?? '');
 $imageUrl = !empty($prod['image']) ? media_image_url($prod['image']) : '';
 
-$translatedName = translate_product_name($prod['name'] ?? '', $prod['name_ta'] ?? null);
-$translatedCategory = translate_text($prod['category_name'] ?? '', $prod['category_name_ta'] ?? null);
+$translatedName = function_exists('translate_product_name')
+    ? translate_product_name($prod['name'] ?? '', $prod['name_ta'] ?? null)
+    : ($prod['name'] ?? '');
+$translatedCategory = function_exists('translate_text')
+    ? translate_text($prod['category_name'] ?? '', $prod['category_name_ta'] ?? null)
+    : ($prod['category_name'] ?? '');
 ?>
 <article class="ez-product-card"
     data-product-id="<?php echo $m['productId']; ?>"
@@ -113,7 +117,11 @@ $translatedCategory = translate_text($prod['category_name'] ?? '', $prod['catego
         </div>
 
         <div class="ez-product-card__pricing">
-            <span class="ez-product-card__price"><?php echo format_price($m['price']); ?></span>
+            <?php
+            $fromLabel = function_exists('__t') ? __t('from') : 'From';
+            if ($fromLabel === 'from') { $fromLabel = 'From'; }
+            ?>
+            <span class="ez-product-card__price"><?php echo $m['hasVariations'] ? ('<small style="font-size:0.75em;font-weight:600;color:#6b7280;margin-right:3px;">' . htmlspecialchars($fromLabel) . '</small>' . format_price($m['price'])) : format_price($m['price']); ?></span>
             <?php if ($m['hasDiscount']): ?>
             <span class="ez-product-card__original"><?php echo format_price($m['originalPrice']); ?></span>
             <?php if ($m['discountPct'] >= 5): ?>

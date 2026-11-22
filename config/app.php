@@ -74,7 +74,7 @@ function public_site_base_url(): string
         // fall through to domain-based default
     }
 
-    $domain = defined('STORE_DOMAIN') ? STORE_DOMAIN : 'vaanakam.lk';
+    $domain = defined('STORE_DOMAIN') ? STORE_DOMAIN : 'vaanakam.com';
     $path = rtrim(BASE_URL, '/');
     $base = 'https://' . $domain . $path;
 

@@ -13,6 +13,9 @@ class CategoryDAL {
         }
         require_once __DIR__ . '/../helpers/db_schema.php';
         db_repair_auto_increment_table($this->conn, 'categories');
+        try {
+            $this->conn->exec("ALTER TABLE categories ADD COLUMN name_ta VARCHAR(150) NULL AFTER name");
+        } catch (\Exception $e) {}
     }
 
     public function getAll() {

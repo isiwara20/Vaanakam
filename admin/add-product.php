@@ -178,14 +178,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $galleryJson = !empty($galleryPaths) ? json_encode($galleryPaths) : null;
     
+    $optionsPayload = json_decode($_POST['variation_options_json'] ?? '[]', true) ?: [];
+    $variationsPayload = json_decode($_POST['variation_rows_json'] ?? '[]', true) ?: [];
+
+    if ($hasVariations && !empty($variationsPayload)) {
+        $minVarPrice = null;
+        $totalVarStock = 0;
+        foreach ($variationsPayload as $vRow) {
+            $vPrice = isset($vRow['price']) && $vRow['price'] !== '' ? (float)$vRow['price'] : null;
+            if ($vPrice !== null && $vPrice > 0 && ($minVarPrice === null || $vPrice < $minVarPrice)) {
+                $minVarPrice = $vPrice;
+            }
+            $totalVarStock += max(0, (int)($vRow['stock'] ?? 0));
+        }
+        if ($minVarPrice !== null && ($price <= 0 || empty($price))) {
+            $price = $minVarPrice;
+        }
+        $stock = $totalVarStock;
+    }
+
     if (empty($name) && empty($message)) {
         $message = 'Product name is required.';
         $messageType = 'error';
     } elseif ($categoryId === 0 && empty($message)) {
         $message = 'Please select a category.';
         $messageType = 'error';
-    } elseif ($price <= 0 && empty($message) && !$hasVariations) {
-        $message = 'Price must be greater than zero.';
+    } elseif ($hasVariations && empty($variationsPayload) && empty($message)) {
+        $message = 'Please add and configure at least one variation (e.g. Weight: 500g, 1kg) with prices before saving.';
+        $messageType = 'error';
+    } elseif ($price <= 0 && empty($message)) {
+        $message = $hasVariations ? 'Please enter a valid price for product variations.' : 'Price must be greater than zero.';
         $messageType = 'error';
     } elseif (empty($message)) {
         $oldProductStock = $isEdit ? (int)($editProduct['stock'] ?? 0) : 0;
@@ -339,7 +361,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         }
         .variation-option-row {
             display: grid;
-            grid-template-columns: minmax(160px, 200px) minmax(0, 1fr) 44px;
+            grid-template-columns: minmax(180px, 240px) minmax(0, 1fr) 44px;
             gap: 12px;
             align-items: start;
             margin-bottom: 12px;
@@ -731,7 +753,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                 
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <label for="price">Price (LKR) <span class="required">*</span></label>
+                                        <label for="price">Price (LKR) <span class="required" id="priceRequiredStar">*</span> <span id="variationPriceNote" style="font-size:12px; font-weight:normal; color:#16A34A; display:none;">(Auto-synced from variation price)</span></label>
                                         <input type="number" id="price" name="price" class="form-control" step="0.01" min="0"
                                                value="<?php echo htmlspecialchars($editProduct['price'] ?? ''); ?>" required>
                                     </div>
@@ -751,7 +773,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label for="stock">Stock Quantity</label>
+                                    <label for="stock">Stock Quantity <span id="variationStockNote" style="font-size:12px; font-weight:normal; color:#16A34A; display:none;">(Auto-calculated from variations)</span></label>
                                     <input type="number" id="stock" name="stock" class="form-control" min="0"
                                            value="<?php echo htmlspecialchars($editProduct['stock'] ?? '0'); ?>">
                                 </div>
@@ -856,13 +878,13 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
 
                         <div id="variationsSection" <?php echo empty($variationData['has_variations']) ? 'hidden' : ''; ?>>
                             <div class="variation-guide">
-                                <h4><i class="fas fa-info-circle"></i> How to add variations</h4>
+                                <h4><i class="fas fa-info-circle"></i> How to add variations (e.g. 500g & 1kg with separate prices)</h4>
                                 <ol>
-                                    <li><strong>Step 1:</strong> Click <em>Add option</em> and choose a type (Size, Color, Capacity, etc.).</li>
-                                    <li><strong>Step 2:</strong> Add values — for <strong>Color</strong>, use the color picker; for others, type values separated by commas (e.g. <code>S, M, L</code> or <code>350ml, 500ml</code>).</li>
-                                    <li><strong>Step 3:</strong> Click <em>Generate all combinations</em> to create every size/color mix automatically.</li>
-                                    <li><strong>Step 4:</strong> Set <strong>price</strong>, <strong>stock</strong>, and optional <strong>SKU</strong> for each combination.</li>
-                                    <li><strong>Step 5:</strong> Save the product — customers will choose options on the product page before adding to cart.</li>
+                                    <li><strong>Step 1:</strong> Select an option name (e.g. <strong>Weight</strong>, <strong>Capacity</strong>, <strong>Pack Quantity</strong>, or choose <em>Custom option</em>).</li>
+                                    <li><strong>Step 2:</strong> Enter your variation values separated by commas (e.g. <code>500g, 1kg</code> or <code>250ml, 500ml, 1L</code>).</li>
+                                    <li><strong>Step 3:</strong> Click <em>Generate all combinations</em> to create the rows in the table below.</li>
+                                    <li><strong>Step 4:</strong> Enter the <strong>separate price</strong> (e.g. 800 for 500g, 1500 for 1kg) and <strong>stock</strong> for each row.</li>
+                                    <li><strong>Step 5:</strong> Click <em>Save Product</em> — the store will display the starting price and customers can choose their preferred weight/size!</li>
                                 </ol>
                             </div>
 
@@ -873,20 +895,20 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                                     <button type="button" class="btn-variation" id="addVariationOptionBtn"><i class="fas fa-plus"></i> Add option</button>
                                     <button type="button" class="btn-variation" id="generateVariationsBtn"><i class="fas fa-magic"></i> Generate all combinations</button>
                                 </div>
-                                <small class="form-help">Tip: A mug might use <strong>Capacity</strong> (350ml, 500ml). A T-shirt might use <strong>Size</strong> + <strong>Color</strong>.</small>
+                                <small class="form-help">Tip: For groceries, select <strong>Weight</strong> (e.g. <code>250g, 500g, 1kg</code>) or <strong>Capacity</strong> (e.g. <code>500ml, 1L</code>) or <strong>Pack Quantity</strong>. Then click <em>Generate all combinations</em> to set the individual price for each size.</small>
                             </div>
 
                             <div class="form-group">
-                                <label>Variation SKUs</label>
+                                <label>Variation SKUs & Pricing</label>
                                 <div class="variation-skus-wrap">
                                     <table class="variation-skus-table">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
                                                 <th>Combination</th>
-                                                <th>Price (LKR)</th>
-                                                <th>Stock</th>
-                                                <th>SKU</th>
+                                                <th>Price (LKR) <span style="color:#dc2626;">*</span></th>
+                                                <th>Stock Quantity</th>
+                                                <th>SKU (Optional)</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -1107,10 +1129,32 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     var variationRowsList = document.getElementById('variationRowsList');
 
     function toggleVariationsSection() {
+        var priceInput = document.getElementById('price');
+        var priceStar = document.getElementById('priceRequiredStar');
+        var priceNote = document.getElementById('variationPriceNote');
+        var stockNote = document.getElementById('variationStockNote');
+        var stockInput = document.getElementById('stock');
+
         if (hasVariationsEl.checked) {
             variationsSection.removeAttribute('hidden');
+            if (priceInput) priceInput.removeAttribute('required');
+            if (priceStar) priceStar.style.display = 'none';
+            if (priceNote) priceNote.style.display = 'inline';
+            if (stockNote) stockNote.style.display = 'inline';
+            if (stockInput) stockInput.readOnly = true;
+
+            if (variationOptions.length === 0) {
+                variationOptions.push({ name: 'Weight', values: [] });
+                renderVariationOptions();
+                renderVariationRows();
+            }
         } else {
             variationsSection.setAttribute('hidden', 'hidden');
+            if (priceInput) priceInput.setAttribute('required', 'required');
+            if (priceStar) priceStar.style.display = '';
+            if (priceNote) priceNote.style.display = 'none';
+            if (stockNote) stockNote.style.display = 'none';
+            if (stockInput) stockInput.readOnly = false;
         }
     }
     hasVariationsEl.addEventListener('change', toggleVariationsSection);
@@ -1143,11 +1187,35 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         return cleanLabel;
     }
 
+    function buildRowKey(options) {
+        if (!options || typeof options !== 'object') return '';
+        var keys = Object.keys(options).sort();
+        return keys.map(function(k) { return k + ':' + options[k]; }).join('|');
+    }
+
+    function getOptionPlaceholder(name) {
+        var lower = String(name || '').toLowerCase().trim();
+        if (lower === 'weight') return 'Values separated by comma (e.g. 250g, 500g, 1kg)';
+        if (lower === 'capacity') return 'Values separated by comma (e.g. 250ml, 500ml, 1L)';
+        if (lower === 'pack quantity') return 'Values separated by comma (e.g. 1 Pack, 2 Pack, Box of 6)';
+        if (lower === 'size') return 'Values separated by comma (e.g. Small, Medium, Large)';
+        return 'Values separated by comma (e.g. 500g, 1kg)';
+    }
+
     function syncOptionValuesFromRow(index) {
         var row = variationOptionsList.children[index];
         if (!row) return;
         var nameSelect = row.querySelector('.variation-option-name');
-        var optName = nameSelect ? nameSelect.value : variationOptions[index].name;
+        var customInput = row.querySelector('.variation-custom-name');
+        var optName = variationOptions[index].name;
+        if (nameSelect) {
+            if (nameSelect.value === '__custom__') {
+                optName = customInput ? customInput.value.trim() : '';
+            } else if (nameSelect.value) {
+                optName = nameSelect.value;
+            }
+        }
+        variationOptions[index].name = optName;
         if (isColorOption(optName)) {
             return;
         }
@@ -1181,12 +1249,17 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         variationOptions.forEach(function(opt, index) {
             var row = document.createElement('div');
             row.className = 'variation-option-row';
-            var selectHtml = '<select class="form-control variation-option-name" data-index="' + index + '">';
-            selectHtml += '<option value="">Custom option</option>';
+            var isPreset = PRESET_OPTIONS.indexOf(opt.name) !== -1;
+
+            var nameColHtml = '<div class="variation-option-name-col">' +
+                '<select class="form-control variation-option-name" data-index="' + index + '">';
             PRESET_OPTIONS.forEach(function(preset) {
-                selectHtml += '<option value="' + preset + '"' + (opt.name === preset ? ' selected' : '') + '>' + preset + '</option>';
+                nameColHtml += '<option value="' + preset + '"' + (opt.name === preset ? ' selected' : '') + '>' + preset + '</option>';
             });
-            selectHtml += '</select>';
+            nameColHtml += '<option value="__custom__"' + (!isPreset && opt.name ? ' selected' : '') + '>Custom option...</option>';
+            nameColHtml += '</select>' +
+                '<input type="text" class="form-control variation-custom-name" data-index="' + index + '" placeholder="Custom name (e.g. Flavour, Cut)" value="' + (!isPreset && opt.name ? opt.name.replace(/"/g, '&quot;') : '') + '" style="margin-top:6px;' + (!isPreset && opt.name ? '' : 'display:none;') + '">' +
+                '</div>';
 
             var valuesWrap = document.createElement('div');
             valuesWrap.className = 'variation-values-wrap';
@@ -1204,10 +1277,10 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     '</div>';
             } else {
                 valuesWrap.innerHTML =
-                    '<input type="text" class="form-control variation-option-values variation-text-values" data-index="' + index + '" placeholder="Values separated by comma (e.g. S, M, L)" value="' + (opt.values || []).join(', ').replace(/"/g, '&quot;') + '">';
+                    '<input type="text" class="form-control variation-option-values variation-text-values" data-index="' + index + '" placeholder="' + getOptionPlaceholder(opt.name) + '" value="' + (opt.values || []).join(', ').replace(/"/g, '&quot;') + '">';
             }
 
-            row.appendChild(document.createRange().createContextualFragment(selectHtml));
+            row.appendChild(document.createRange().createContextualFragment(nameColHtml));
             row.appendChild(valuesWrap);
 
             var removeBtn = document.createElement('button');
@@ -1219,20 +1292,27 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             variationOptionsList.appendChild(row);
 
             var nameSelect = row.querySelector('.variation-option-name');
-            if (opt.name && PRESET_OPTIONS.indexOf(opt.name) === -1) {
-                var custom = document.createElement('option');
-                custom.value = opt.name;
-                custom.textContent = opt.name;
-                custom.selected = true;
-                nameSelect.appendChild(custom);
-            }
+            var customInput = row.querySelector('.variation-custom-name');
 
             nameSelect.addEventListener('change', function() {
+                if (this.value === '__custom__') {
+                    customInput.style.display = '';
+                    customInput.focus();
+                    variationOptions[index].name = customInput.value.trim() || 'Custom';
+                } else {
+                    customInput.style.display = 'none';
+                    variationOptions[index].name = this.value;
+                }
                 syncOptionValuesFromRow(index);
-                variationOptions[index].name = this.value || variationOptions[index].name;
                 renderVariationOptions();
                 renderVariationRows();
             });
+
+            if (customInput) {
+                customInput.addEventListener('input', function() {
+                    variationOptions[index].name = this.value.trim();
+                });
+            }
 
             if (isColorOption(opt.name)) {
                 var chips = row.querySelector('.variation-color-chips');
@@ -1324,6 +1404,40 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         return '<div class="variation-combo-editable">' + (selects || '<small class="form-help">Add options first</small>') + '</div>';
     }
 
+    function syncBasePriceAndStock() {
+        if (!hasVariationsEl.checked || !variationRows.length) return;
+        var minPrice = null;
+        var totalStock = 0;
+        variationRows.forEach(function(r) {
+            var p = parseFloat(r.price);
+            if (!isNaN(p) && p > 0) {
+                if (minPrice === null || p < minPrice) minPrice = p;
+            }
+            totalStock += (parseInt(r.stock, 10) || 0);
+        });
+        var priceInput = document.getElementById('price');
+        if (priceInput && minPrice !== null) {
+            priceInput.value = minPrice;
+        }
+        var stockInput = document.getElementById('stock');
+        if (stockInput) {
+            stockInput.value = totalStock;
+        }
+    }
+
+    function syncVariationRowsFromDom() {
+        var trs = variationRowsList.querySelectorAll('tr');
+        trs.forEach(function(tr, idx) {
+            if (!variationRows[idx]) return;
+            var priceInp = tr.querySelector('.variation-row-price');
+            var stockInp = tr.querySelector('.variation-row-stock');
+            var skuInp = tr.querySelector('.variation-row-sku');
+            if (priceInp) variationRows[idx].price = priceInp.value.trim();
+            if (stockInp) variationRows[idx].stock = parseInt(stockInp.value, 10) || 0;
+            if (skuInp) variationRows[idx].sku = skuInp.value.trim();
+        });
+    }
+
     function renderVariationRows() {
         variationRowsList.innerHTML = '';
         var emptyState = document.getElementById('variationRowsEmpty');
@@ -1337,12 +1451,16 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
 
         variationRows.forEach(function(row, index) {
             var rowEl = document.createElement('tr');
+            var priceVal = (row.price !== null && row.price !== undefined && row.price !== '') ? row.price : '';
+            var stockVal = (row.stock !== null && row.stock !== undefined) ? row.stock : 0;
+            var skuVal = row.sku || '';
+
             rowEl.innerHTML =
                 '<td class="variation-row-num">' + (index + 1) + '</td>' +
                 '<td class="variation-combo-cell">' + renderComboCell(row, index) + '</td>' +
-                '<td><input type="number" class="form-control variation-row-price variation-input-price" data-row="' + index + '" step="0.01" min="0" placeholder="0.00" aria-label="Price for row ' + (index + 1) + '" value="' + (row.price !== '' ? row.price : '') + '"></td>' +
-                '<td><input type="number" class="form-control variation-row-stock variation-input-stock" data-row="' + index + '" min="0" aria-label="Stock for row ' + (index + 1) + '" value="' + (row.stock || 0) + '"></td>' +
-                '<td><input type="text" class="form-control variation-row-sku" data-row="' + index + '" placeholder="SKU code" aria-label="SKU for row ' + (index + 1) + '" value="' + (row.sku || '').replace(/"/g, '&quot;') + '"></td>' +
+                '<td><input type="number" class="form-control variation-row-price variation-input-price" data-row="' + index + '" step="0.01" min="0" placeholder="e.g. 800.00" aria-label="Price for row ' + (index + 1) + '" value="' + priceVal + '" required></td>' +
+                '<td><input type="number" class="form-control variation-row-stock variation-input-stock" data-row="' + index + '" min="0" placeholder="0" aria-label="Stock for row ' + (index + 1) + '" value="' + stockVal + '"></td>' +
+                '<td><input type="text" class="form-control variation-row-sku" data-row="' + index + '" placeholder="SKU code" aria-label="SKU for row ' + (index + 1) + '" value="' + skuVal.replace(/"/g, '&quot;') + '"></td>' +
                 '<td style="text-align:center;"><button type="button" class="btn-secondary variation-row-delete" onclick="removeVariationRow(' + index + ')" aria-label="Remove row ' + (index + 1) + '"><i class="fas fa-trash"></i></button></td>';
             variationRowsList.appendChild(rowEl);
 
@@ -1354,16 +1472,24 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
                     variationRows[rowIndex].label = buildRowLabel(variationRows[rowIndex].options);
                 });
             });
-            rowEl.querySelector('.variation-row-price').addEventListener('input', function() {
+            var priceInp = rowEl.querySelector('.variation-row-price');
+            priceInp.addEventListener('input', function() {
                 variationRows[parseInt(this.getAttribute('data-row'), 10)].price = this.value;
+                this.style.borderColor = '';
+                this.style.boxShadow = '';
+                syncBasePriceAndStock();
             });
-            rowEl.querySelector('.variation-row-stock').addEventListener('input', function() {
+            var stockInp = rowEl.querySelector('.variation-row-stock');
+            stockInp.addEventListener('input', function() {
                 variationRows[parseInt(this.getAttribute('data-row'), 10)].stock = parseInt(this.value, 10) || 0;
+                syncBasePriceAndStock();
             });
             rowEl.querySelector('.variation-row-sku').addEventListener('input', function() {
                 variationRows[parseInt(this.getAttribute('data-row'), 10)].sku = this.value;
             });
         });
+
+        syncBasePriceAndStock();
     }
 
     function buildRowLabel(options) {
@@ -1387,7 +1513,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
     };
 
     document.getElementById('addVariationOptionBtn').addEventListener('click', function() {
-        variationOptions.push({ name: 'Size', values: [] });
+        variationOptions.push({ name: 'Weight', values: [] });
         renderVariationOptions();
         renderVariationRows();
     });
@@ -1397,7 +1523,7 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
         renderVariationRows();
     });
 
-    document.getElementById('generateVariationsBtn').addEventListener('click', function() {
+    function generateCombinations() {
         var hasError = false;
         variationOptions.forEach(function(opt, idx) {
             if (hasError) return;
@@ -1405,20 +1531,31 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             var row = variationOptionsList.children[idx];
             if (!row) return;
             var nameSelect = row.querySelector('.variation-option-name');
-            var customName = nameSelect ? nameSelect.value : opt.name;
-            if (!customName) {
-                alert('Please choose an option name for row ' + (idx + 1));
+            var customInput = row.querySelector('.variation-custom-name');
+            var chosenName = opt.name;
+            if (nameSelect) {
+                if (nameSelect.value === '__custom__') {
+                    chosenName = customInput ? customInput.value.trim() : '';
+                } else if (nameSelect.value) {
+                    chosenName = nameSelect.value;
+                }
+            }
+            if (!chosenName) {
+                alert('Please choose or enter an option name for row ' + (idx + 1));
                 hasError = true;
+                if (customInput) { customInput.style.display = ''; customInput.focus(); }
                 return;
             }
-            opt.name = customName;
+            opt.name = chosenName;
         });
-        if (hasError) return;
-        var activeOptions = variationOptions.filter(function(opt) { return opt.name && opt.values.length; });
+        if (hasError) return false;
+
+        var activeOptions = variationOptions.filter(function(opt) { return opt.name && opt.values && opt.values.length; });
         if (!activeOptions.length) {
-            alert('Add at least one option with values.');
-            return;
+            alert('Add at least one option with values (e.g. Weight: 500g, 1kg).');
+            return false;
         }
+
         function cartesian(arr, prefix) {
             if (!arr.length) return [prefix || {}];
             var first = arr[0];
@@ -1431,21 +1568,111 @@ $adminName = $_SESSION['user_name'] ?? 'Admin';
             });
             return results;
         }
+
+        // Map existing rows by key so we don't erase prices/stocks if admin regenerates
+        var existingMap = {};
+        variationRows.forEach(function(r) {
+            var k = buildRowKey(r.options);
+            if (k) existingMap[k] = r;
+        });
+
         var combos = cartesian(activeOptions, {});
         variationRows = combos.map(function(options) {
+            var k = buildRowKey(options);
+            if (existingMap[k]) {
+                return {
+                    options: options,
+                    price: existingMap[k].price !== '' ? existingMap[k].price : '',
+                    stock: existingMap[k].stock || 0,
+                    sku: existingMap[k].sku || '',
+                    status: existingMap[k].status || 'active'
+                };
+            }
             return { options: options, price: '', stock: 0, sku: '', status: 'active' };
         });
-        renderVariationOptions();
-        renderVariationRows();
+        return true;
+    }
+
+    document.getElementById('generateVariationsBtn').addEventListener('click', function() {
+        if (generateCombinations()) {
+            renderVariationOptions();
+            renderVariationRows();
+        }
     });
 
-    document.querySelector('.product-form').addEventListener('submit', function() {
+    document.querySelector('.product-form').addEventListener('submit', function(e) {
+        if (!hasVariationsEl.checked) {
+            document.getElementById('variationOptionsJson').value = '[]';
+            document.getElementById('variationRowsJson').value = '[]';
+            return;
+        }
+
+        // Variations are enabled
         variationOptions.forEach(function(opt, idx) {
             syncOptionValuesFromRow(idx);
         });
-        document.getElementById('variationOptionsJson').value = JSON.stringify(
-            variationOptions.filter(function(opt) { return opt.name && opt.values.length; })
-        );
+
+        var activeOptions = variationOptions.filter(function(opt) { return opt.name && opt.values && opt.values.length; });
+        if (!activeOptions.length) {
+            e.preventDefault();
+            alert('You enabled product variations, but have not added any options (e.g. Weight: 500g, 1kg). Please add options or uncheck "Enable product variations".');
+            return;
+        }
+
+        // Auto-generate combination rows if not generated yet
+        if (variationRows.length === 0) {
+            var ok = generateCombinations();
+            if (ok) {
+                renderVariationOptions();
+                renderVariationRows();
+                e.preventDefault();
+                alert('Variation rows have been generated based on your options (e.g. 500g, 1kg). Please enter the separate price and stock for each variation in the table, then click Save.');
+                var firstPrice = variationRowsList.querySelector('.variation-row-price');
+                if (firstPrice) firstPrice.focus();
+            } else {
+                e.preventDefault();
+            }
+            return;
+        }
+
+        syncVariationRowsFromDom();
+
+        // Validate that all variation rows have a valid price > 0
+        var invalidRowIdx = -1;
+        var minPositivePrice = null;
+        for (var i = 0; i < variationRows.length; i++) {
+            var rowP = parseFloat(variationRows[i].price);
+            if (isNaN(rowP) || rowP <= 0) {
+                invalidRowIdx = i;
+                break;
+            }
+            if (minPositivePrice === null || rowP < minPositivePrice) {
+                minPositivePrice = rowP;
+            }
+        }
+
+        if (invalidRowIdx !== -1) {
+            e.preventDefault();
+            var trs = variationRowsList.querySelectorAll('tr');
+            if (trs[invalidRowIdx]) {
+                var badInp = trs[invalidRowIdx].querySelector('.variation-row-price');
+                if (badInp) {
+                    badInp.focus();
+                    badInp.style.borderColor = '#dc2626';
+                    badInp.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.2)';
+                }
+            }
+            alert('Please enter a separate price for each variation row (row #' + (invalidRowIdx + 1) + ' is missing a valid price).');
+            return;
+        }
+
+        // Ensure base price is synced to minimum variation price
+        var mainPrice = document.getElementById('price');
+        if (mainPrice && (!mainPrice.value || parseFloat(mainPrice.value) <= 0)) {
+            mainPrice.value = minPositivePrice !== null ? minPositivePrice : '';
+        }
+
+        document.getElementById('variationOptionsJson').value = JSON.stringify(activeOptions);
         document.getElementById('variationRowsJson').value = JSON.stringify(
             variationRows.filter(function(row) {
                 return Object.keys(row.options || {}).length > 0;

@@ -79,6 +79,7 @@ return [
     'sold'                 => 'Sold',
     'only_x_left'          => 'Only :count Left',
     'only_left'            => 'Only :count left',
+    'from'                 => 'From',
     'select_options'       => 'Select Options',
     'view_product'         => 'View Product',
     'processing'           => 'Processing...',

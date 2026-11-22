@@ -21,65 +21,68 @@ class ProductDAL {
         try {
             $this->conn->exec("ALTER TABLE products ADD COLUMN warranty_period VARCHAR(20) NULL DEFAULT NULL AFTER stock");
         } catch (\Exception $e) {}
+        try {
+            $this->conn->exec("ALTER TABLE products ADD COLUMN name_ta VARCHAR(255) NULL AFTER name");
+        } catch (\Exception $e) {}
+        try {
+            $this->conn->exec("ALTER TABLE categories ADD COLUMN name_ta VARCHAR(150) NULL AFTER name");
+        } catch (\Exception $e) {}
+    }
+
+    private function executeSafely(string $sql, array $params = []): PDOStatement {
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (\PDOException $e) {
+            if ($e->getCode() === '42S22' || strpos($e->getMessage(), '1054') !== false) {
+                // Remove c.name_ta from query if column doesn't exist
+                $cleanSql = str_replace('c.name_ta as category_name_ta', 'NULL as category_name_ta', $sql);
+                $stmt = $this->conn->prepare($cleanSql);
+                $stmt->execute($params);
+                return $stmt;
+            }
+            throw $e;
+        }
     }
 
     public function getAll() {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.sort_order ASC, p.created_at DESC");
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.sort_order ASC, p.created_at DESC")->fetchAll();
     }
 
     public function getActive() {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC");
-        $stmt->execute();
-        return $stmt->fetchAll();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC")->fetchAll();
     }
 
     public function getById($id) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta, c.slug as category_slug FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = :id");
-        $stmt->execute([':id' => $id]);
-        return $stmt->fetch();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta, c.slug as category_slug FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = :id", [':id' => $id])->fetch();
     }
 
     public function getBySlug($slug) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta, c.slug as category_slug FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.slug = :slug");
-        $stmt->execute([':slug' => $slug]);
-        return $stmt->fetch();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta, c.slug as category_slug FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.slug = :slug", [':slug' => $slug])->fetch();
     }
 
     public function getByCategory($categoryId) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.category_id = :category_id AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC");
-        $stmt->execute([':category_id' => $categoryId]);
-        return $stmt->fetchAll();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.category_id = :category_id AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC", [':category_id' => $categoryId])->fetchAll();
     }
 
     public function getBySubcategory($subcategoryId) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.subcategory_id = :subcategory_id AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC");
-        $stmt->execute([':subcategory_id' => $subcategoryId]);
-        return $stmt->fetchAll();
+        return $this->executeSafely("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.subcategory_id = :subcategory_id AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC", [':subcategory_id' => $subcategoryId])->fetchAll();
     }
 
     public function getFeatured($limit = 6) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.featured = 1 AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC LIMIT :limit");
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $sql = "SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.featured = 1 AND p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC LIMIT " . (int)$limit;
+        return $this->executeSafely($sql)->fetchAll();
     }
 
     public function getLatest($limit = 8) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC LIMIT :limit");
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $sql = "SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.status = 'active' ORDER BY p.sort_order ASC, p.created_at DESC LIMIT " . (int)$limit;
+        return $this->executeSafely($sql)->fetchAll();
     }
 
     public function getRelated($categoryId, $excludeId, $limit = 6) {
-        $stmt = $this->conn->prepare("SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.category_id = :category_id AND p.id != :exclude_id AND p.status = 'active' ORDER BY RAND() LIMIT :limit");
-        $stmt->bindParam(':category_id', $categoryId, PDO::PARAM_INT);
-        $stmt->bindParam(':exclude_id', $excludeId, PDO::PARAM_INT);
-        $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        $sql = "SELECT p.*, c.name as category_name, c.name_ta as category_name_ta FROM " . $this->table . " p LEFT JOIN categories c ON p.category_id = c.id WHERE p.category_id = :category_id AND p.id != :exclude_id AND p.status = 'active' ORDER BY RAND() LIMIT " . (int)$limit;
+        return $this->executeSafely($sql, [':category_id' => $categoryId, ':exclude_id' => $excludeId])->fetchAll();
     }
 
     public function create($data) {

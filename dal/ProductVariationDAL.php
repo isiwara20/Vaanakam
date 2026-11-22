@@ -6,13 +6,13 @@ class ProductVariationDAL
     private $conn;
 
     public const PRESET_OPTIONS = [
+        'Weight',
+        'Capacity',
+        'Pack Quantity',
         'Size',
         'Color',
         'Material',
-        'Weight',
         'Design / Style',
-        'Capacity',
-        'Pack Quantity',
     ];
 
     public function __construct()
@@ -212,6 +212,8 @@ class ProductVariationDAL
 
         $variationStmt = $this->conn->prepare('INSERT INTO product_variations (product_id, sku, options_json, options_label, price, stock, status, sort_order) VALUES (:product_id, :sku, :options_json, :options_label, :price, :stock, :status, :sort_order)');
         $totalStock = 0;
+        $insertedCount = 0;
+        $minPrice = null;
         foreach ($variations as $index => $variation) {
             $opts = $variation['options'] ?? [];
             if (empty($opts) || !is_array($opts)) {
@@ -221,6 +223,9 @@ class ProductVariationDAL
             $price = isset($variation['price']) && $variation['price'] !== '' ? (float)$variation['price'] : null;
             $stock = max(0, (int)($variation['stock'] ?? 0));
             $totalStock += $stock;
+            if ($price !== null && $price > 0 && ($minPrice === null || $price < $minPrice)) {
+                $minPrice = $price;
+            }
             $sku = trim((string)($variation['sku'] ?? ''));
             $variationStmt->execute([
                 ':product_id' => $productId,
@@ -232,10 +237,22 @@ class ProductVariationDAL
                 ':status' => ($variation['status'] ?? 'active') === 'inactive' ? 'inactive' : 'active',
                 ':sort_order' => $index,
             ]);
+            $insertedCount++;
+        }
+
+        if ($insertedCount === 0) {
+            $this->conn->prepare('UPDATE products SET has_variations = 0 WHERE id = :id')
+                ->execute([':id' => $productId]);
+            return;
         }
 
         $stockStmt = $this->conn->prepare('UPDATE products SET stock = :stock WHERE id = :id');
         $stockStmt->execute([':stock' => $totalStock, ':id' => $productId]);
+
+        if ($minPrice !== null && $minPrice > 0) {
+            $priceStmt = $this->conn->prepare('UPDATE products SET price = :price WHERE id = :id');
+            $priceStmt->execute([':price' => $minPrice, ':id' => $productId]);
+        }
     }
 
     public function buildOptionsLabel(array $options): string
